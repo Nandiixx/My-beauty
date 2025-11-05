@@ -3,6 +3,7 @@ CREATE TABLE Usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
+    telefone VARCHAR(20),
     senha_hash VARCHAR(255) NOT NULL -- Armazenar senhas como hash
 );
 
@@ -11,7 +12,6 @@ CREATE TABLE Usuario (
 CREATE TABLE Cliente (
     id INT PRIMARY KEY AUTO_INCREMENT,
     usuario_id INT NOT NULL UNIQUE,
-    telefone VARCHAR(20),
     FOREIGN KEY (usuario_id) REFERENCES Usuario(id)
 );
 
