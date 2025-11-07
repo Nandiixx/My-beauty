@@ -1,6 +1,5 @@
 <?php
-// A variável $erro é definida pelo UsuarioController caso a validação falhe.
-// A variável $sucesso é definida pelo UsuarioController ao exibir a view.
+// A variável $erro é definida pelo FuncionarioController caso a validação falhe.
 // (Não precisamos de lógica aqui, apenas exibir as variáveis que o Controller nos envia)
 ?>
 <!DOCTYPE html>
@@ -8,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyBeauty - Cadastro de Cliente</title>
+    <title>MyBeauty - Cadastrar Profissional</title>
     <link rel="icon" type="image/svg+xml" href="../../assets/images/favicon.svg">
     <link rel="preload" as="image" href="../../assets/images/background.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,8 +27,8 @@
                         </svg>
                     </div>
                     <div>
-                        <h1 class="brand-title">Criar Conta - MyBeauty</h1>
-                        <p class="brand-subtitle">Cadastre-se como cliente</p>
+                        <h1 class="brand-title">Cadastrar Profissional</h1>
+                        <p class="brand-subtitle">Adicione um novo membro à equipe</p>
                     </div>
                 </div>
 
@@ -37,7 +36,7 @@
                     <div class="alert-error" role="alert"><?php echo htmlspecialchars($erro); ?></div>
                 <?php endif; ?>
 
-                <form class="auth-form form-grid-2" method="POST" action="../index.php?acao=salvar_cliente" novalidate>
+                <form class="auth-form form-grid-2" method="POST" action="../Index.php?acao=funcionario_salvar" novalidate>
                     <div class="input-field">
                         <span class="input-icon" aria-hidden="true">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -89,15 +88,48 @@
                     <div class="input-field">
                         <span class="input-icon" aria-hidden="true">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.5-6.5l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1zM19 12h2a9 9 0 0 0-9-9v2c3.9 0 7 3.1 7 7zm-4 0h2c0-2.8-2.2-5-5-5v2c1.7 0 3 1.3 3 3z" fill="currentColor"/>
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
                             </svg>
                         </span>
-                        <input type="tel" id="telefone" name="telefone" placeholder="Telefone" required
-                               value="<?php echo isset($_POST['telefone']) ? htmlspecialchars($_POST['telefone']) : ''; ?>">
+                        <input type="text" id="matricula" name="matricula" placeholder="Matrícula" required
+                               value="<?php echo isset($_POST['matricula']) ? htmlspecialchars($_POST['matricula']) : ''; ?>">
                     </div>
 
-                    <button type="submit" class="btn-primary" data-loading="false" aria-busy="false">
-                        <span class="btn-label">Criar conta</span>
+                    <div class="input-field">
+                        <span class="input-icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="currentColor"/>
+                            </svg>
+                        </span>
+                        <select name="cargo" id="cargo" required>
+                            <option value="">Selecione um cargo</option>
+                            <option value="PROFISSIONAL_BELEZA" <?php echo (isset($_POST['cargo']) && $_POST['cargo'] === 'PROFISSIONAL_BELEZA') ? 'selected' : ''; ?>>
+                                Profissional de Beleza
+                            </option>
+                            <option value="RECEPCIONISTA" <?php echo (isset($_POST['cargo']) && $_POST['cargo'] === 'RECEPCIONISTA') ? 'selected' : ''; ?>>
+                                Recepcionista
+                            </option>
+                            <option value="PROPRIETARIO" <?php echo (isset($_POST['cargo']) && $_POST['cargo'] === 'PROPRIETARIO') ? 'selected' : ''; ?>>
+                                Proprietário
+                            </option>
+                            <option value="GERENTE_FINANCEIRO" <?php echo (isset($_POST['cargo']) && $_POST['cargo'] === 'GERENTE_FINANCEIRO') ? 'selected' : ''; ?>>
+                                Gerente Financeiro
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="input-field" style="grid-column: 1 / -1;">
+                        <span class="input-icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+                            </svg>
+                        </span>
+                        <input type="text" id="especialidade" name="especialidade" placeholder="Especialidade (opcional)"
+                               value="<?php echo isset($_POST['especialidade']) ? htmlspecialchars($_POST['especialidade']) : ''; ?>">
+                    </div>
+
+                    <button type="submit" class="btn-primary" data-loading="false" aria-busy="false" style="grid-column: 1 / -1;">
+                        <span class="btn-label">Cadastrar Profissional</span>
                         <span class="btn-spinner" aria-hidden="true"></span>
                     </button>
                 </form>
@@ -105,7 +137,7 @@
                 <div class="auth-divider" role="separator"></div>
 
                 <div class="auth-cta">
-                    <p class="auth-cta-text">Já tem uma conta? <a class="auth-cta-link" href="../index.php?acao=login_mostrar"><strong>Entrar</strong></a></p>
+                    <p class="auth-cta-text"><a class="auth-cta-link" href="../Index.php?acao=funcionario_listar"><strong>← Voltar para lista</strong></a></p>
                 </div>
             </div>
         </section>

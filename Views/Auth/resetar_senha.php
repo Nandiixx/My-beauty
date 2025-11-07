@@ -1,46 +1,11 @@
 <?php
-// Inicia a sessão se necessário
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-$token = isset($_GET['token']) ? (string)$_GET['token'] : '';
+// Verifica se o usuário tem permissão para acessar esta página
 $email = isset($_GET['email']) ? trim((string)$_GET['email']) : '';
-
-// Processa o formulário de redefinição de senha
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-	$nova = isset($_POST['nova_senha']) ? (string)$_POST['nova_senha'] : '';
-	$conf = isset($_POST['confirma_senha']) ? (string)$_POST['confirma_senha'] : '';
-	$emailPost = isset($_POST['email']) ? trim((string)$_POST['email']) : '';
-
-	if ($nova !== '' && $nova === $conf && $emailPost !== '') {
-		require_once __DIR__ . '/Models/ConexaoDB.php';
-		try {
-			$pdo = ConexaoDB::getConnection();
-			$hash = password_hash($nova, PASSWORD_DEFAULT);
-			$stmt = $pdo->prepare('UPDATE Usuario SET senha_hash = ? WHERE email = ?');
-			$stmt->execute([$hash, $emailPost]);
-			
-			if ($stmt->rowCount() > 0) {
-				header('Location: Index.php?acao=login_mostrar&senha=alterada');
-				exit;
-			} else {
-				header('Location: resetar-senha.php?email=' . urlencode($emailPost) . '&erro=1');
-				exit;
-			}
-		} catch (Throwable $e) {
-			header('Location: resetar-senha.php?email=' . urlencode($emailPost) . '&erro=1');
-			exit;
-		}
-	} else {
-		header('Location: resetar-senha.php?email=' . urlencode($emailPost) . '&erro=2');
-		exit;
-	}
-}
+$token = isset($_GET['token']) ? (string)$_GET['token'] : '';
 
 // Se o email não foi fornecido, redireciona para recuperar senha
 if (empty($email)) {
-	header('Location: recuperar-senha.php');
+	header('Location: Index.php?acao=recuperar_senha_mostrar');
 	exit;
 }
 ?>
@@ -50,8 +15,8 @@ if (empty($email)) {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>MyBeauty - Redefinir senha</title>
-	<link rel="icon" type="image/svg+xml" href="favicon.svg">
-	<link rel="preload" as="image" href="background.png">
+	<link rel="icon" type="image/svg+xml" href="../../assets/images/favicon.svg">
+	<link rel="preload" as="image" href="../../assets/images/background.png">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -88,7 +53,7 @@ if (empty($email)) {
 				</div>
 				<?php endif; ?>
 
-				<form class="auth-form" action="resetar-senha.php" method="POST" novalidate>
+				<form class="auth-form" action="Index.php?acao=resetar_senha_processar" method="POST" novalidate>
 					<input type="hidden" name="token" value="<?php echo htmlspecialchars($token, ENT_QUOTES, 'UTF-8'); ?>">
 					<input type="hidden" name="email" value="<?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>">
 
@@ -134,4 +99,3 @@ if (empty($email)) {
 	</main>
 </body>
 </html>
-

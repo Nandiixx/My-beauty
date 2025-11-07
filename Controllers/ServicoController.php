@@ -21,7 +21,7 @@ class ServicoController {
         $servicos = $servicoModel->listarTodos();
         
         // Chama a View
-        require_once __DIR__ . '/../Views/servico_listar.php';
+        require_once __DIR__ . '/../Views/Admin/Servico/servico_listar.php';
     }
 
     // CREATE (Mostrar formulário de cadastro)
@@ -33,7 +33,7 @@ class ServicoController {
         $titulo = 'Cadastrar Novo Serviço';
         
         // Reutiliza o formulário
-        require_once __DIR__ . '/../Views/servico_formulario.php';
+        require_once __DIR__ . '/../Views/Admin/Servico/servico_formulario.php';
     }
 
     // CREATE (Processar dados do formulário)
@@ -68,7 +68,7 @@ class ServicoController {
         $titulo = 'Editar Serviço';
         
         // Reutiliza o formulário
-        require_once __DIR__ . '/../Views/servico_formulario.php';
+        require_once __DIR__ . '/../Views/Admin/Servico/servico_formulario.php';
     }
 
     // UPDATE (Processar dados do formulário)

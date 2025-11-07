@@ -8,11 +8,13 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'Controllers/UsuarioController.php';
 require_once 'Controllers/AgendamentoController.php';
 require_once 'Controllers/ServicoController.php';
+require_once 'Controllers/FuncionarioController.php';
 
 // Instancia os controllers
 $userController = new UsuarioController();
 $agendamentoController = new AgendamentoController();
-$servicoController = new ServicoController(); // Instanciado
+$servicoController = new ServicoController();
+$funcionarioController = new FuncionarioController();
 
 // Define a ação padrão (mostrar login) se nenhuma for especificada
 $acao = $_GET['acao'] ?? 'login_mostrar';
@@ -55,6 +57,19 @@ switch ($acao) {
         $userController->atualizarPerfil();
         break;
     
+    // --- FLUXO DE RECUPERAÇÃO DE SENHA ---
+    case 'recuperar_senha_mostrar':
+        $userController->mostrarRecuperarSenha();
+        break;
+    
+    case 'resetar_senha_mostrar':
+        $userController->mostrarResetarSenha();
+        break;
+    
+    case 'resetar_senha_processar':
+        $userController->processarResetarSenha();
+        break;
+    
     // --- FLUXO DE AGENDAMENTO (CLIENTE) ---
     case 'agendamento_criar':
         $agendamentoController->index(); // (Visão do Cliente)
@@ -71,6 +86,14 @@ switch ($acao) {
     
     case 'agendamento_cancelar':
         $agendamentoController->cancelar(); // Cancelar agendamento
+        break;
+    
+    case 'agendamento_editar':
+        $agendamentoController->mostrarFormularioEdicao(); // Mostrar formulário de edição
+        break;
+    
+    case 'agendamento_atualizar':
+        $agendamentoController->atualizar(); // Processar atualização do agendamento
         break;
     
     case 'agendamento_excluir':
@@ -164,19 +187,49 @@ switch ($acao) {
         }
         break;
 
-    // --- MELHORIA: ROTAS FALTANTES DO PAINEL ADMIN ---
+    // --- ROTAS DE FUNCIONÁRIO/PROFISSIONAL ---
+    case 'funcionario_cadastro_mostrar':
+        $funcionarioController->mostrarCadastro();
+        break;
+        
+    case 'funcionario_salvar':
+        $funcionarioController->salvarCadastro();
+        break;
+        
     case 'funcionario_listar':
-        // TODO: Criar o Controller e o Model para listar funcionários
-        // Por enquanto, vamos carregar uma view de placeholder:
-        echo "Página 'Gerenciar Profissionais' ainda não implementada.";
-        // require_once __DIR__ . '/../Views/funcionario_listar.php';
+        $funcionarioController->listar();
+        break;
+        
+    case 'funcionario_editar_mostrar':
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $funcionarioController->mostrarEditar($id);
+        } else {
+            header('Location: Index.php?acao=funcionario_listar&erro=id');
+        }
+        break;
+        
+    case 'funcionario_atualizar':
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $funcionarioController->atualizar($id);
+        } else {
+            header('Location: Index.php?acao=funcionario_listar&erro=id');
+        }
+        break;
+        
+    case 'funcionario_excluir':
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $funcionarioController->excluir($id);
+        } else {
+            header('Location: Index.php?acao=funcionario_listar&erro=id');
+        }
         break;
         
     case 'cliente_listar':
-        // TODO: Criar o Controller e o Model para listar clientes
-        // Por enquanto, vamos carregar uma view de placeholder:
-         echo "Página 'Gerenciar Clientes' ainda não implementada.";
-        // require_once __DIR__ . '/../Views/cliente_listar.php';
+        // TODO: Criar ClienteController e implementar listagem
+        echo "Página 'Gerenciar Clientes' ainda não implementada.";
         break;
 
     // Ação padrão

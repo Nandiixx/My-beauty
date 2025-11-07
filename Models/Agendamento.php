@@ -146,6 +146,48 @@ class Agendamento
     }
 
     /**
+     * Lista todos os agendamentos (para Admin)
+     */
+    public function listarTodos()
+    {
+        require_once __DIR__ . '/ConexaoDB.php';
+        try {
+            $pdo = ConexaoDB::getConnection();
+            $lista = [];
+
+            $sql = "SELECT 
+                        a.id,
+                        c_user.nome AS cliente_nome,
+                        f_user.nome AS profissional_nome,
+                        GROUP_CONCAT(s.nome SEPARATOR ', ') AS servicos,
+                        a.data_hora,
+                        a.status
+                    FROM Agendamento a
+                    JOIN Cliente c ON a.cliente_id = c.id
+                    JOIN Usuario c_user ON c.usuario_id = c_user.id
+                    JOIN Funcionario f ON a.profissional_id = f.id
+                    JOIN Usuario f_user ON f.usuario_id = f_user.id
+                    JOIN Agendamento_Servicos asv ON a.id = asv.agendamento_id
+                    JOIN Servico s ON asv.servico_id = s.id
+                    GROUP BY a.id
+                    ORDER BY a.data_hora DESC";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+            
+            while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
+                $lista[] = $row;
+            }
+            
+            return $lista;
+
+        } catch (Exception $e) {
+            error_log("Error in listarTodos: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Atualiza o status de um agendamento específico.
      * @param int $idAgendamento O ID do agendamento a ser atualizado.
      * @param int $idStatus O novo ID do status (2 para Concluído, 3 para Cancelado).
@@ -192,6 +234,108 @@ class Agendamento
             return $stmt->rowCount() > 0;
         } catch (Exception $e) {
             error_log("Erro ao excluir agendamento: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Busca um agendamento específico por ID
+     * @param int $id O ID do agendamento
+     * @return object|null Retorna o objeto do agendamento ou null se não encontrado
+     */
+    public function buscarPorId($id) {
+        require_once __DIR__ . '/ConexaoDB.php';
+        try {
+            $pdo = ConexaoDB::getConnection();
+            
+            $sql = "SELECT 
+                        a.id,
+                        a.cliente_id,
+                        a.profissional_id,
+                        c_user.nome AS cliente_nome,
+                        f_user.nome AS profissional_nome,
+                        GROUP_CONCAT(s.id) AS servico_ids,
+                        GROUP_CONCAT(s.nome SEPARATOR ', ') AS servicos,
+                        a.data_hora,
+                        a.status
+                    FROM Agendamento a
+                    JOIN Cliente c ON a.cliente_id = c.id
+                    JOIN Usuario c_user ON c.usuario_id = c_user.id
+                    JOIN Funcionario f ON a.profissional_id = f.id
+                    JOIN Usuario f_user ON f.usuario_id = f_user.id
+                    JOIN Agendamento_Servicos asv ON a.id = asv.agendamento_id
+                    JOIN Servico s ON asv.servico_id = s.id
+                    WHERE a.id = :id
+                    GROUP BY a.id";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([':id' => $id]);
+            
+            $resultado = $stmt->fetch(PDO::FETCH_OBJ);
+            return $resultado ?: null;
+
+        } catch (Exception $e) {
+            error_log("Error in buscarPorId: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Atualiza um agendamento existente (profissional, data/hora e serviços)
+     * @param int $id O ID do agendamento a ser atualizado
+     * @param int $profissional_id O novo ID do profissional
+     * @param string $data_hora A nova data e hora
+     * @param array $servicos_ids Array com os IDs dos novos serviços
+     * @return bool Retorna true se a atualização foi bem-sucedida
+     */
+    public function atualizarBD($id, $profissional_id, $data_hora, $servicos_ids) {
+        require_once __DIR__ . '/ConexaoDB.php';
+        try {
+            $pdo = ConexaoDB::getConnection();
+            
+            // Inicia transação
+            $pdo->beginTransaction();
+
+            // 1. Atualiza os dados principais do agendamento
+            $sql = "UPDATE Agendamento 
+                    SET profissional_id = :profissional_id, 
+                        data_hora = :data_hora 
+                    WHERE id = :id";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':profissional_id' => $profissional_id,
+                ':data_hora' => $data_hora,
+                ':id' => $id
+            ]);
+
+            // 2. Remove os serviços antigos
+            $sql_delete = "DELETE FROM Agendamento_Servicos WHERE agendamento_id = :agendamento_id";
+            $stmt_delete = $pdo->prepare($sql_delete);
+            $stmt_delete->execute([':agendamento_id' => $id]);
+
+            // 3. Insere os novos serviços
+            $sql_insert = "INSERT INTO Agendamento_Servicos (agendamento_id, servico_id) 
+                          VALUES (:agendamento_id, :servico_id)";
+            $stmt_insert = $pdo->prepare($sql_insert);
+
+            foreach ($servicos_ids as $servico_id) {
+                $stmt_insert->execute([
+                    ':agendamento_id' => $id,
+                    ':servico_id' => $servico_id
+                ]);
+            }
+            
+            // Se tudo deu certo, comita
+            $pdo->commit();
+            return true;
+
+        } catch (Exception $e) {
+            // Se algo deu errado, faz rollback
+            if (isset($pdo)) {
+                $pdo->rollBack();
+            }
+            error_log("Error in atualizarBD: " . $e->getMessage());
             return false;
         }
     }

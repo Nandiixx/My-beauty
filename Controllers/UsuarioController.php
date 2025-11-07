@@ -22,7 +22,7 @@ class UsuarioController
         // Verifica se há uma mensagem de erro (vindo da autenticação)
         $erro = $_GET['erro'] ?? null;
         
-        require_once __DIR__ . '/../Views/login.php';
+        require_once __DIR__ . '/../Views/Auth/login.php';
     }
 
     /**
@@ -30,7 +30,7 @@ class UsuarioController
      */
     public function mostrarCadastro()
     {
-        require_once __DIR__ . '/../Views/cadastrar.php';
+        require_once __DIR__ . '/../Views/Cliente/cadastrar.php';
     }
 
     /**
@@ -80,7 +80,7 @@ class UsuarioController
         }
         
         // Se houver erro ou for o primeiro acesso, exibe a view de cadastro
-        require_once __DIR__ . '/../Views/cadastrar.php';
+        require_once __DIR__ . '/../Views/Cliente/cadastrar.php';
     }
 
     /**
@@ -160,24 +160,90 @@ class UsuarioController
         }
 
         $tipo = $_SESSION['usuario_tipo'] ?? null;
-        $cargo = $_SESSION['usuario_cargo'] ?? null;
         
         if ($tipo == 'ADMIN') {
-            // Se for admin, carrega a view de admin
-            require_once __DIR__ . '/../Views/inicio_admi.php';
+            // Se for admin, chama o método específico
+            $this->mostrarDashboardAdmin();
                 
         } else if ($tipo == 'PROFISSIONAL') {
-            // Se for profissional, carrega a view de profissional
-            require_once __DIR__ . '/../Views/inicio_profissional.php';
+            // Se for profissional, redireciona para o controller de agendamento
+            $agendamentoController = new AgendamentoController();
+            $agendamentoController->mostrarDashboardProfissional();
             
         } elseif ($tipo == 'CLIENTE') {
-            // Se for cliente, carrega a view de cliente
-            require_once __DIR__ . '/../Views/inicio_cliente.php';
+            // Se for cliente, redireciona para o controller de agendamento
+            $agendamentoController = new AgendamentoController();
+            $agendamentoController->mostrarDashboardCliente();
             
         } else {
             // Se o tipo for desconhecido, força o logout por segurança
             $this->logout();
         }
+    }
+    
+    /**
+     * Mostra o dashboard do administrador com estatísticas
+     * Processa toda a lógica de negócio antes de passar para a View
+     */
+    public function mostrarDashboardAdmin()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        // Verifica se é admin
+        if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_cargo'] ?? '', ['PROPRIETARIO', 'GERENTE_FINANCEIRO'])) {
+            header("Location: Index.php?acao=login_mostrar");
+            exit;
+        }
+        
+        $nomeUsuario = $_SESSION['usuario_nome'] ?? 'Admin';
+        $cargo = $_SESSION['usuario_cargo'] ?? 'Admin';
+        
+        // Buscar estatísticas usando consultas diretas (temporariamente até criar métodos nos Models)
+        try {
+            $pdo = ConexaoDB::getConnection();
+            
+            // Total de clientes
+            $stmt = $pdo->query("SELECT COUNT(*) as total FROM Cliente");
+            $total_clientes = $stmt->fetch()['total'] ?? 0;
+            
+            // Total de funcionários
+            $stmt = $pdo->query("SELECT COUNT(*) as total FROM Funcionario");
+            $total_funcionarios = $stmt->fetch()['total'] ?? 0;
+            
+            // Total de serviços
+            $stmt = $pdo->query("SELECT COUNT(*) as total FROM Servico");
+            $total_servicos = $stmt->fetch()['total'] ?? 0;
+            
+            // Total de agendamentos
+            $stmt = $pdo->query("SELECT COUNT(*) as total FROM Agendamento");
+            $total_agendamentos = $stmt->fetch()['total'] ?? 0;
+            
+            // Prepara dados para a View
+            $dados = [
+                'nomeUsuario' => $nomeUsuario,
+                'cargo' => $cargo,
+                'total_clientes' => $total_clientes,
+                'total_funcionarios' => $total_funcionarios,
+                'total_servicos' => $total_servicos,
+                'total_agendamentos' => $total_agendamentos
+            ];
+            
+        } catch (Exception $e) {
+            // Em caso de erro, define valores padrão
+            $dados = [
+                'nomeUsuario' => $nomeUsuario,
+                'cargo' => $cargo,
+                'total_clientes' => 0,
+                'total_funcionarios' => 0,
+                'total_servicos' => 0,
+                'total_agendamentos' => 0
+            ];
+        }
+        
+        // Inclui a View
+        require_once __DIR__ . '/../Views/Admin/inicio_admi.php';
     }
 
     /**
@@ -218,7 +284,7 @@ class UsuarioController
         // Carrega os dados atuais do usuário
         $usuario = new Usuario();
         if ($usuario->carregarUsuarioPorId($_SESSION['usuario_id'])) {
-            require_once __DIR__ . '/../Views/meu_perfil.php';
+            require_once __DIR__ . '/../Views/Cliente/meu_perfil.php';
         } else {
             $_SESSION['erro_perfil'] = "Erro ao carregar dados do usuário.";
             header('Location: Index.php?acao=inicio');
@@ -320,6 +386,72 @@ class UsuarioController
             
             $_SESSION['erros_perfil'] = $erros;
             header('Location: Index.php?acao=perfil_mostrar');
+            exit;
+        }
+    }
+    
+    /**
+     * Exibe a página de recuperação de senha.
+     */
+    public function mostrarRecuperarSenha()
+    {
+        require_once __DIR__ . '/../Views/Auth/recuperar_senha.php';
+    }
+    
+    /**
+     * Exibe a página de redefinição de senha.
+     */
+    public function mostrarResetarSenha()
+    {
+        require_once __DIR__ . '/../Views/Auth/resetar_senha.php';
+    }
+    
+    /**
+     * Processa a redefinição de senha.
+     */
+    public function processarResetarSenha()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: Index.php?acao=recuperar_senha_mostrar');
+            exit;
+        }
+        
+        $nova = isset($_POST['nova_senha']) ? (string)$_POST['nova_senha'] : '';
+        $conf = isset($_POST['confirma_senha']) ? (string)$_POST['confirma_senha'] : '';
+        $emailPost = isset($_POST['email']) ? trim((string)$_POST['email']) : '';
+        $token = isset($_POST['token']) ? (string)$_POST['token'] : '';
+        
+        // Validação básica
+        if (empty($nova) || empty($conf) || empty($emailPost)) {
+            header('Location: Index.php?acao=resetar_senha_mostrar&email=' . urlencode($emailPost) . '&erro=2');
+            exit;
+        }
+        
+        if ($nova !== $conf) {
+            header('Location: Index.php?acao=resetar_senha_mostrar&email=' . urlencode($emailPost) . '&erro=2');
+            exit;
+        }
+        
+        if (strlen($nova) < 6) {
+            header('Location: Index.php?acao=resetar_senha_mostrar&email=' . urlencode($emailPost) . '&erro=2');
+            exit;
+        }
+        
+        try {
+            $pdo = ConexaoDB::getConnection();
+            $hash = password_hash($nova, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare('UPDATE Usuario SET senha_hash = ? WHERE email = ?');
+            $stmt->execute([$hash, $emailPost]);
+            
+            if ($stmt->rowCount() > 0) {
+                header('Location: Index.php?acao=login_mostrar&senha=alterada');
+                exit;
+            } else {
+                header('Location: Index.php?acao=resetar_senha_mostrar&email=' . urlencode($emailPost) . '&erro=1');
+                exit;
+            }
+        } catch (Throwable $e) {
+            header('Location: Index.php?acao=resetar_senha_mostrar&email=' . urlencode($emailPost) . '&erro=1');
             exit;
         }
     }

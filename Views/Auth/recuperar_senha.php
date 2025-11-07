@@ -4,8 +4,8 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>MyBeauty - Recuperar senha</title>
-	<link rel="icon" type="image/svg+xml" href="favicon.svg">
-	<link rel="preload" as="image" href="background.png">
+	<link rel="icon" type="image/svg+xml" href="../../assets/images/favicon.svg">
+	<link rel="preload" as="image" href="../../assets/images/background.png">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -46,7 +46,8 @@
 				</div>
 				<?php endif; ?>
 
-				<form class="auth-form" action="resetar-senha.php" method="GET" novalidate>
+				<form class="auth-form" action="Index.php?acao=resetar_senha_mostrar" method="GET" novalidate>
+					<input type="hidden" name="acao" value="resetar_senha_mostrar">
 					<div class="input-field">
 						<span class="input-icon" aria-hidden="true">
 							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -70,4 +71,3 @@
 	</main>
 </body>
 </html>
-

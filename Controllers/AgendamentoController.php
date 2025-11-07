@@ -50,7 +50,7 @@ class AgendamentoController
 
         // --- Inclui a View ---
         // Passa as 3 listas para a View
-        include_once __DIR__ . '/../Views/agendamento.php';
+        include_once __DIR__ . '/../Views/Cliente/agendamento.php';
     }
 
     /**
@@ -75,8 +75,8 @@ class AgendamentoController
         if (empty($_POST['dataHora'])) {
             $erros[] = "Você deve selecionar uma data e hora.";
         }
-        if (empty($_POST['servicos_ids']) || !is_array($_POST['servicos_ids'])) {
-            $erros[] = "Você deve selecionar pelo menos um serviço.";
+        if (empty($_POST['servico_id'])) {
+            $erros[] = "Você deve selecionar um serviço.";
         }
         // (Você pode adicionar mais validações, ex: verificar se a data é no futuro)
 
@@ -97,10 +97,8 @@ class AgendamentoController
             $agendamento->setProfissionalId((int)$_POST['profissional_id']);
             $agendamento->setDataHora($_POST['dataHora']);
             
-            // Adiciona os serviços (pode ser mais de um)
-            foreach ($_POST['servicos_ids'] as $servico_id) {
-                $agendamento->addServico((int)$servico_id);
-            }
+            // Adiciona o serviço único
+            $agendamento->addServico((int)$_POST['servico_id']);
 
             // Salva no banco
             if ($agendamento->inserirBD()) {
@@ -145,7 +143,114 @@ class AgendamentoController
         $lista_agenda_profissional = $agendamentoModel->listarAgendaPorProfissional($funcionario_id);
         
         // Inclui a nova View
-        include_once __DIR__ . '/../Views/agenda_profissional.php';
+        include_once __DIR__ . '/../Views/Profissional/agenda_profissional.php';
+    }
+    
+    /**
+     * Mostra o dashboard do profissional com estatísticas
+     * Processa toda a lógica de negócio antes de passar para a View
+     */
+    public function mostrarDashboardProfissional()
+    {
+        // Requer login de Profissional
+        if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] != 'PROFISSIONAL') {
+            header('Location: Index.php?acao=login_mostrar');
+            exit;
+        }
+        
+        $agendamentoModel = new Agendamento();
+        $funcionario_id = $_SESSION['funcionario_id'] ?? null;
+        
+        // Busca todos os agendamentos do profissional
+        $agendamentos = [];
+        if ($funcionario_id) {
+            $agendamentos = $agendamentoModel->listarAgendaPorProfissional($funcionario_id);
+        }
+        
+        // Processa estatísticas
+        $usuario_nome = $_SESSION['usuario_nome'] ?? 'Profissional';
+        $total_agendamentos = count($agendamentos);
+        
+        // Filtra agendamentos de hoje
+        $hoje = new DateTime();
+        $hoje->setTime(0, 0, 0);
+        $agendamentos_hoje = array_filter($agendamentos, function($ag) use ($hoje) {
+            $data = new DateTime($ag->data_hora);
+            $data->setTime(0, 0, 0);
+            return $data == $hoje && $ag->status === 'AGENDADO';
+        });
+        
+        // Filtra próximos agendamentos
+        $agendamentos_proximos = array_filter($agendamentos, function($ag) {
+            $data = new DateTime($ag->data_hora);
+            return $data > new DateTime() && $ag->status === 'AGENDADO';
+        });
+        
+        // Conta agendamentos concluídos
+        $total_concluidos = count(array_filter($agendamentos, fn($a) => $a->status === 'CONCLUIDO'));
+        
+        // Prepara dados para a View
+        $dados = [
+            'usuario_nome' => $usuario_nome,
+            'total_agendamentos' => $total_agendamentos,
+            'agendamentos_hoje' => $agendamentos_hoje,
+            'agendamentos_proximos' => $agendamentos_proximos,
+            'total_concluidos' => $total_concluidos,
+            'proximos_count' => count($agendamentos_proximos)
+        ];
+        
+        // Inclui a View
+        include_once __DIR__ . '/../Views/Profissional/inicio_profissional.php';
+    }
+    
+    /**
+     * Mostra o dashboard do cliente com estatísticas
+     * Processa toda a lógica de negócio antes de passar para a View
+     */
+    public function mostrarDashboardCliente()
+    {
+        // Requer login de Cliente
+        if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] != 'CLIENTE') {
+            header('Location: Index.php?acao=login_mostrar');
+            exit;
+        }
+        
+        $agendamentoModel = new Agendamento();
+        $cliente_id = $_SESSION['cliente_id'] ?? null;
+        
+        // Busca todos os agendamentos do cliente
+        $agendamentos = [];
+        if ($cliente_id) {
+            $agendamentos = $agendamentoModel->listarAgendamentosCliente($cliente_id);
+        }
+        
+        // Processa estatísticas
+        $usuario_nome = $_SESSION['usuario_nome'] ?? 'Cliente';
+        $total_agendamentos = count($agendamentos);
+        
+        // Filtra próximos agendamentos
+        $agendamentos_proximos = array_filter($agendamentos, function($ag) {
+            $data = new DateTime($ag->data_hora);
+            return $data > new DateTime();
+        });
+        
+        // Conta por status
+        $total_concluidos = count(array_filter($agendamentos, fn($a) => $a->status === 'CONCLUIDO'));
+        $total_agendados = count(array_filter($agendamentos, fn($a) => $a->status === 'AGENDADO'));
+        
+        // Prepara dados para a View
+        $dados = [
+            'usuario_nome' => $usuario_nome,
+            'total_agendamentos' => $total_agendamentos,
+            'agendamentos' => $agendamentos,
+            'agendamentos_proximos' => $agendamentos_proximos,
+            'proximos_count' => count($agendamentos_proximos),
+            'total_concluidos' => $total_concluidos,
+            'total_agendados' => $total_agendados
+        ];
+        
+        // Inclui a View
+        include_once __DIR__ . '/../Views/Cliente/inicio_cliente.php';
     }
 
     /**
@@ -167,11 +272,13 @@ class AgendamentoController
      */
     public function gerenciarAgendamentos()
     {
-        // Requer login de Cliente
-        if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] != 'CLIENTE') {
+        // Requer login (Cliente, Profissional ou Admin)
+        if (!isset($_SESSION['usuario_id'])) {
             header('Location: Index.php?acao=login_mostrar');
             exit;
         }
+        
+        $usuario_tipo = $_SESSION['usuario_tipo'] ?? '';
         
         // --- Carrega dados para a View ---
         
@@ -183,23 +290,44 @@ class AgendamentoController
         $funcModel = new Funcionario();
         $lista_profissionais = $funcModel->listarTodosProfissionais(); 
         
-        // 3. Carrega agendamentos existentes do cliente
+        // 3. Carrega agendamentos baseado no tipo de usuário
         $agendamentoModel = new Agendamento();
-        // Tenta obter o cliente_id da sessão. Se não existir, usa fallback
-        $cliente_id = $_SESSION['cliente_id'] ?? null; // Pega da sessão
-        if (empty($cliente_id) && isset($_SESSION['usuario_id'])) {
-            require_once __DIR__ . '/../Models/Cliente.php';
-            $clienteModel = new Cliente();
-            if ($clienteModel->carregarClientePorUsuarioId($_SESSION['usuario_id'])) {
-                $cliente_id = $clienteModel->getId();
-                $_SESSION['cliente_id'] = $cliente_id;
+        
+        if ($usuario_tipo === 'CLIENTE') {
+            // Para clientes, carrega apenas seus agendamentos
+            $cliente_id = $_SESSION['cliente_id'] ?? null;
+            if (empty($cliente_id) && isset($_SESSION['usuario_id'])) {
+                require_once __DIR__ . '/../Models/Cliente.php';
+                $clienteModel = new Cliente();
+                if ($clienteModel->carregarClientePorUsuarioId($_SESSION['usuario_id'])) {
+                    $cliente_id = $clienteModel->getId();
+                    $_SESSION['cliente_id'] = $cliente_id;
+                }
             }
+            $lista_agendamentos = $agendamentoModel->listarAgendamentosCliente($cliente_id);
+            
+            // Inclui a view do Cliente/Admin (mesmo arquivo)
+            include_once __DIR__ . '/../Views/Admin/gerenciar_agendamento.php';
+            
+        } elseif ($usuario_tipo === 'PROFISSIONAL') {
+            // Para profissionais, carrega os agendamentos deles
+            $profissional_id = $_SESSION['profissional_id'] ?? $_SESSION['usuario_id'] ?? null;
+            $lista_agendamentos = $agendamentoModel->listarAgendaPorProfissional($profissional_id);
+            
+            // Inclui a view do Profissional
+            include_once __DIR__ . '/../Views/Profissional/gerenciar_agendamento.php';
+            
+        } elseif ($usuario_tipo === 'ADMIN') {
+            // Para admin, carrega todos os agendamentos
+            $lista_agendamentos = $agendamentoModel->listarTodos();
+            
+            // Inclui a view do Admin
+            include_once __DIR__ . '/../Views/Admin/gerenciar_agendamento.php';
+        } else {
+            // Tipo de usuário desconhecido
+            header('Location: Index.php?acao=login_mostrar');
+            exit;
         }
-        $lista_agendamentos = $agendamentoModel->listarAgendamentosCliente($cliente_id);
-
-        // --- Inclui a View ---
-        // Passa as 3 listas para a View
-        include_once __DIR__ . '/../Views/gerenciar_agendamento.php';
     }
     
     /**
@@ -262,6 +390,156 @@ class AgendamentoController
             header("Location: Index.php?acao=gerenciar_agendamento_mostrar&status=excluido_erro");
         }
         exit;
+    }
+
+    /**
+     * Método para exibir o formulário de edição de agendamento
+     */
+    public function mostrarFormularioEdicao()
+    {
+        // Verifica se o usuário está logado
+        if (!isset($_SESSION['usuario_id'])) {
+            header('Location: Index.php?acao=login_mostrar');
+            exit;
+        }
+        
+        // Verifica se foi passado o ID do agendamento
+        if (!isset($_GET['id'])) {
+            $_SESSION['erros_agendamento'] = ["ID do agendamento não informado."];
+            header("Location: Index.php?acao=gerenciar_agendamento_mostrar");
+            exit;
+        }
+        
+        $id = (int)$_GET['id'];
+        $agendamentoModel = new Agendamento();
+        
+        // Busca o agendamento
+        $agendamento = $agendamentoModel->buscarPorId($id);
+        
+        if (!$agendamento) {
+            $_SESSION['erros_agendamento'] = ["Agendamento não encontrado."];
+            header("Location: Index.php?acao=gerenciar_agendamento_mostrar");
+            exit;
+        }
+        
+        // Verifica se o usuário pode editar este agendamento
+        $usuario_tipo = $_SESSION['usuario_tipo'] ?? '';
+        if ($usuario_tipo === 'CLIENTE') {
+            $cliente_id = $_SESSION['cliente_id'] ?? null;
+            if ($agendamento->cliente_id != $cliente_id) {
+                $_SESSION['erros_agendamento'] = ["Você não tem permissão para editar este agendamento."];
+                header("Location: Index.php?acao=gerenciar_agendamento_mostrar");
+                exit;
+            }
+        }
+        
+        // Carrega lista de serviços e profissionais
+        $servicoModel = new Servico();
+        $lista_servicos = $servicoModel->listarTodos();
+        
+        $funcModel = new Funcionario();
+        $lista_profissionais = $funcModel->listarTodosProfissionais();
+        
+        // Inclui a View de edição
+        include_once __DIR__ . '/../Views/Cliente/editar_agendamento.php';
+    }
+    
+    /**
+     * Método para processar a atualização de um agendamento
+     */
+    public function atualizar()
+    {
+        // Verifica se o usuário está logado
+        if (!isset($_SESSION['usuario_id'])) {
+            header('Location: Index.php?acao=login_mostrar');
+            exit;
+        }
+        
+        $erros = [];
+        
+        // Validação dos dados de entrada
+        if (empty($_POST['id'])) {
+            $erros[] = "ID do agendamento não informado.";
+        }
+        if (empty($_POST['profissional_id'])) {
+            $erros[] = "Você deve selecionar um profissional.";
+        }
+        if (empty($_POST['dataHora'])) {
+            $erros[] = "Você deve selecionar uma data e hora.";
+        } else {
+            // Validação de formato de data/hora
+            $dataHora = $_POST['dataHora'];
+            $dateTime = DateTime::createFromFormat('Y-m-d\TH:i', $dataHora);
+            if (!$dateTime || $dateTime->format('Y-m-d\TH:i') !== $dataHora) {
+                $erros[] = "Formato de data/hora inválido.";
+            } else {
+                // Validação de data no futuro
+                $now = new DateTime();
+                if ($dateTime < $now) {
+                    $erros[] = "A data e hora devem ser no futuro.";
+                }
+                
+                // Validação de horário de expediente (8h às 16h)
+                $hora = (int)$dateTime->format('H');
+                if ($hora < 8 || $hora >= 16) {
+                    $erros[] = "O horário deve estar entre 8:00 e 16:00.";
+                }
+            }
+        }
+        if (empty($_POST['servico_id'])) {
+            $erros[] = "Você deve selecionar um serviço.";
+        }
+        
+        // Se houver erros, armazena na sessão e redireciona de volta
+        if (!empty($erros)) {
+            $_SESSION['erros_agendamento'] = $erros;
+            header('Location: Index.php?acao=agendamento_editar&id=' . ($_POST['id'] ?? ''));
+            exit;
+        }
+        
+        try {
+            $id = (int)$_POST['id'];
+            $agendamentoModel = new Agendamento();
+            
+            // Busca o agendamento para verificar permissões
+            $agendamento = $agendamentoModel->buscarPorId($id);
+            
+            if (!$agendamento) {
+                $_SESSION['erros_agendamento'] = ["Agendamento não encontrado."];
+                header("Location: Index.php?acao=gerenciar_agendamento_mostrar");
+                exit;
+            }
+            
+            // Verifica permissões
+            $usuario_tipo = $_SESSION['usuario_tipo'] ?? '';
+            if ($usuario_tipo === 'CLIENTE') {
+                $cliente_id = $_SESSION['cliente_id'] ?? null;
+                if ($agendamento->cliente_id != $cliente_id) {
+                    $_SESSION['erros_agendamento'] = ["Você não tem permissão para editar este agendamento."];
+                    header("Location: Index.php?acao=gerenciar_agendamento_mostrar");
+                    exit;
+                }
+            }
+            
+            // Atualiza o agendamento
+            $profissional_id = (int)$_POST['profissional_id'];
+            $data_hora = $_POST['dataHora'];
+            $servico_id = [(int)$_POST['servico_id']]; // Array com um único serviço
+            
+            if ($agendamentoModel->atualizarBD($id, $profissional_id, $data_hora, $servico_id)) {
+                $_SESSION['sucesso_agendamento'] = "Agendamento atualizado com sucesso!";
+                header('Location: Index.php?acao=gerenciar_agendamento_mostrar');
+                exit;
+            } else {
+                $_SESSION['erros_agendamento'] = ["Erro ao atualizar o agendamento no banco de dados."];
+                header('Location: Index.php?acao=agendamento_editar&id=' . $id);
+                exit;
+            }
+        } catch (Exception $e) {
+            $_SESSION['erros_agendamento'] = ["Erro inesperado no servidor: " . $e->getMessage()];
+            header('Location: Index.php?acao=agendamento_editar&id=' . ($_POST['id'] ?? ''));
+            exit;
+        }
     }
 }
 ?>
