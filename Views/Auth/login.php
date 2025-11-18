@@ -43,7 +43,7 @@
                 <?php endif; ?>
 
 
-                <form class="auth-form" action="../index.php?acao=autenticar" method="POST" novalidate>
+                <form class="auth-form" action="Index.php?acao=autenticar" method="POST" novalidate>
                     <div class="input-field">
                         <span class="input-icon" aria-hidden="true">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -80,7 +80,7 @@
                 <div class="auth-divider" role="separator"></div>
 
                 <div class="auth-cta">
-                    <p class="auth-cta-text">Você ainda não tem uma conta? <a class="auth-cta-link" href="../index.php?acao=cadastro_mostrar"><strong>Registre-se</strong></a></p>
+                    <p class="auth-cta-text">Você ainda não tem uma conta? <a class="auth-cta-link" href="Index.php?acao=cadastro_mostrar"><strong>Registre-se</strong></a></p>
                 </div>
             </div>
         </section>

@@ -81,5 +81,40 @@ class Cliente extends Usuario
             return false;
         }
     }
+    
+    /**
+     * Lista todos os clientes cadastrados com dados de usuário
+     * @return array Lista de clientes completos
+     */
+    public function listarTodos()
+    {
+        try {
+            $pdo = ConexaoDB::getConnection();
+            $lista = [];
+
+            $sql = "SELECT c.id, c.usuario_id,
+                           u.nome, u.email, u.telefone,
+                           (SELECT COUNT(*) FROM Agendamento WHERE cliente_id = c.id) as total_agendamentos,
+                           (SELECT MAX(data_hora) FROM Agendamento WHERE cliente_id = c.id) as ultimo_agendamento
+                    FROM Cliente c
+                    JOIN Usuario u ON c.usuario_id = u.id
+                    ORDER BY u.nome";
+                    
+            $stmt = $pdo->query($sql);
+            while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
+                $lista[] = $row;
+            }
+
+            return $lista;
+
+        } catch (Exception $e) {
+            error_log("Error in Cliente::listarTodos: " . $e->getMessage());
+            return [];
+        }
+    }
+    
+    public function getId() { 
+        return $this->id; 
+    }
 }
 ?>

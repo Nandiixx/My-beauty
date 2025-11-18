@@ -1,15 +1,4 @@
 <?php
-// Inicia a sessão se já não estiver iniciada
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Verifica se o usuário está logado e é admin
-if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_cargo'], ['PROPRIETARIO', 'GERENTE_FINANCEIRO'])) {
-    header('Location: Index.php?acao=login_mostrar');
-    exit;
-}
-
 // A variável $servicos é fornecida pelo ServicoController::listar()
 $usuario_nome = $_SESSION['usuario_nome'] ?? 'Admin';
 ?>
@@ -25,25 +14,97 @@ $usuario_nome = $_SESSION['usuario_nome'] ?? 'Admin';
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../../assets/css/style.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../../../assets/js/navbar.js"></script>
 </head>
 <body>
+    <!-- Burger Menu Overlay -->
+    <div class="burger-menu-overlay" onclick="if(!document.body.classList.contains('menu-pinned')) { toggleBurgerMenu(); }"></div>
+
     <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="Index.php?acao=inicio" class="navbar-brand">
-                <div class="navbar-brand__icon"><i data-lucide="sparkles"></i></div>
-                <span>MyBeauty</span>
-            </a>
+            <div class="navbar-left">
+                <button class="navbar-burger" onclick="toggleBurgerMenu()" aria-label="Menu">
+                    <i data-lucide="menu"></i>
+                </button>
+                <a href="Index.php?acao=inicio" class="navbar-brand">
+                    <div class="navbar-brand__icon"><i data-lucide="sparkles"></i></div>
+                    <span>MyBeauty</span>
+                </a>
+            </div>
+            <div class="burger-menu">
+                <div class="burger-menu__header">
+                    <span class="burger-menu__title">Menu Admin</span>
+                    <button class="burger-menu__pin" onclick="togglePinMenu()" aria-label="Fixar Menu">
+                        <i data-lucide="pin"></i>
+                    </button>
+                </div>
+                <div class="burger-menu__content">
+                    <a href="Index.php?acao=inicio" class="burger-menu__item">
+                        <i data-lucide="home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="Index.php?acao=gerenciar_agendamento_mostrar" class="burger-menu__item">
+                        <i data-lucide="clipboard-list"></i>
+                        <span>Gerenciar Agendamentos</span>
+                    </a>
+                    <a href="Index.php?acao=servico_listar" class="burger-menu__item burger-menu__item--active">
+                        <i data-lucide="sparkles"></i>
+                        <span>Serviços</span>
+                    </a>
+                    <a href="Index.php?acao=funcionario_listar" class="burger-menu__item">
+                        <i data-lucide="user-check"></i>
+                        <span>Profissionais</span>
+                    </a>
+                    <a href="Index.php?acao=cliente_listar" class="burger-menu__item">
+                        <i data-lucide="users"></i>
+                        <span>Clientes</span>
+                    </a>
+                    <a href="Index.php?acao=relatorio_financeiro_mostrar" class="burger-menu__item">
+                        <i data-lucide="dollar-sign"></i>
+                        <span>Relatório Financeiro</span>
+                    </a>
+                    <a href="Index.php?acao=relatorio_clientes_mostrar" class="burger-menu__item">
+                        <i data-lucide="bar-chart"></i>
+                        <span>Relatório de Clientes</span>
+                    </a>
+                    <a href="Index.php?acao=despesa_listar" class="burger-menu__item">
+                        <i data-lucide="trending-down"></i>
+                        <span>Gerenciar Despesas</span>
+                    </a>
+                    <div class="burger-menu__divider"></div>
+                    <a href="Index.php?acao=logout" class="burger-menu__item">
+                        <i data-lucide="log-out"></i>
+                        <span>Sair</span>
+                    </a>
+                </div>
+            </div>
             
             <div class="navbar-actions">
                 <a href="Index.php?acao=servico_formulario_cadastrar" class="btn-header btn-header--success">
                     <i data-lucide="plus-circle"></i>
                     <span>Novo Serviço</span>
                 </a>
-                <a href="Index.php?acao=inicio" class="btn-header btn-header--primary">
-                    <i data-lucide="home"></i>
-                    <span>Voltar ao Dashboard</span>
-                </a>
+                <div class="navbar-user" onclick="toggleUserMenu()">
+                    <div class="navbar-user__avatar">
+                        <?php echo strtoupper(substr($usuario_nome, 0, 1)); ?>
+                    </div>
+                    <div class="navbar-user__info">
+                        <div class="navbar-user__name"><?php echo htmlspecialchars(explode(' ', $usuario_nome)[0]); ?></div>
+                        <div class="navbar-user__role">Admin</div>
+                    </div>
+                    <div class="navbar-user__dropdown">
+                        <a href="#" class="navbar-user__dropdown-item">
+                            <i data-lucide="user"></i>
+                            <span>Meu Perfil</span>
+                        </a>
+                        <div class="navbar-user__dropdown-divider"></div>
+                        <a href="Index.php?acao=logout" class="navbar-user__dropdown-item">
+                            <i data-lucide="log-out"></i>
+                            <span>Sair</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -159,7 +220,7 @@ $usuario_nome = $_SESSION['usuario_nome'] ?? 'Admin';
                         <i data-lucide="package-x"></i>
                     </div>
                     <div class="empty-state__text">Nenhum serviço cadastrado</div>
-                    <a href="Index.php?acao=servico_formulario_cadastrar" class="btn-primary" style="margin-top: 1rem;">
+                    <a href="Index.php?acao=servico_formulario_cadastrar" class="btn-primary mt-1">
                         <i data-lucide="plus-circle"></i>
                         <span>Cadastrar Primeiro Serviço</span>
                     </a>

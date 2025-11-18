@@ -73,6 +73,10 @@ $proximos_count = $dados['proximos_count'] ?? 0;
                         <i data-lucide="clipboard-list"></i>
                         <span>Gerenciar Agendamentos</span>
                     </a>
+                    <a href="Index.php?acao=profissional_historico_cliente" class="burger-menu__item">
+                        <i data-lucide="history"></i>
+                        <span>Histórico de Clientes</span>
+                    </a>
                     <div class="burger-menu__divider"></div>
                     <a href="Index.php?acao=logout" class="burger-menu__item">
                         <i data-lucide="log-out"></i>
@@ -106,6 +110,10 @@ $proximos_count = $dados['proximos_count'] ?? 0;
                         <a href="Index.php?acao=gerenciar_agendamento_mostrar" class="navbar-user__dropdown-item">
                             <i data-lucide="clipboard-list"></i>
                             <span>Gerenciar Agendamentos</span>
+                        </a>
+                        <a href="Index.php?acao=profissional_historico_cliente" class="navbar-user__dropdown-item">
+                            <i data-lucide="history"></i>
+                            <span>Histórico de Clientes</span>
                         </a>
                         <div class="navbar-user__dropdown-divider"></div>
                         <a href="Index.php?acao=logout" class="navbar-user__dropdown-item">
@@ -150,7 +158,7 @@ $proximos_count = $dados['proximos_count'] ?? 0;
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+        <div class="layout-two-cols">
             <div class="section-card">
                 <div class="section-card__header">
                     <h2 class="section-card__title">Próximos Agendamentos</h2>
@@ -174,7 +182,19 @@ $proximos_count = $dados['proximos_count'] ?? 0;
                                             <div class="date-badge__month"><?php echo $data['mes']; ?></div>
                                         </div>
                                         <div class="agendamento-item__info">
-                                            <h3 class="agendamento-item__title"><?php echo htmlspecialchars($agendamento->servicos ?? 'Serviço'); ?></h3>
+                                            <h3 class="agendamento-item__title">Agendamento #<?php echo htmlspecialchars($agendamento->id); ?></h3>
+                                            <div class="agendamento-servicos">
+                                                <?php 
+                                                // Divide os serviços e cria badges individuais
+                                                $servicos_array = explode(', ', $agendamento->servicos ?? 'Serviço');
+                                                foreach($servicos_array as $servico_nome): 
+                                                ?>
+                                                    <span class="servico-badge">
+                                                        <i data-lucide="scissors"></i>
+                                                        <?php echo htmlspecialchars(trim($servico_nome)); ?>
+                                                    </span>
+                                                <?php endforeach; ?>
+                                            </div>
                                             <p class="agendamento-item__details">
                                                 <strong>Cliente:</strong> <?php echo htmlspecialchars($agendamento->cliente_nome ?? 'N/A'); ?><br>
                                                 <strong>Horário:</strong> <?php echo $data['hora']; ?> • <?php echo $data['data_completa']; ?>
@@ -203,11 +223,11 @@ $proximos_count = $dados['proximos_count'] ?? 0;
                             <p>Visualizar agenda completa</p>
                         </div>
                     </a>
-                    <a href="Index.php?acao=inicio" class="quick-action-card">
-                        <div class="quick-action-card__icon"><i data-lucide="home"></i></div>
+                    <a href="Index.php?acao=profissional_historico_cliente" class="quick-action-card">
+                        <div class="quick-action-card__icon"><i data-lucide="history"></i></div>
                         <div class="quick-action-card__content">
-                            <h3>Dashboard</h3>
-                            <p>Voltar ao início</p>
+                            <h3>Histórico de Clientes</h3>
+                            <p>Consultar serviços realizados</p>
                         </div>
                     </a>
                 </div>

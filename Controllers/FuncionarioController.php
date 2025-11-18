@@ -11,10 +11,28 @@ require_once __DIR__ . '/../Models/ConexaoDB.php';
 class FuncionarioController
 {
     /**
+     * Garante que apenas admins (PROPRIETARIO ou GERENTE_FINANCEIRO) acessem.
+     */
+    private function checarAdmin()
+    {
+        if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_cargo'], ['PROPRIETARIO', 'GERENTE_FINANCEIRO'])) {
+            header("Location: Index.php?acao=login_mostrar");
+            exit;
+        }
+    }
+    
+    /**
      * Exibe a página de cadastro de funcionário/profissional.
      */
     public function mostrarCadastro()
     {
+        // Verifica se é ADMIN ou RECEPCIONISTA
+        if (!isset($_SESSION['usuario_id']) || 
+            !in_array($_SESSION['usuario_cargo'] ?? '', ['PROPRIETARIO', 'GERENTE_FINANCEIRO', 'RECEPCIONISTA'])) {
+            header("Location: Index.php?acao=login_mostrar");
+            exit;
+        }
+        
         $erro = null;
         require_once __DIR__ . '/../Views/Profissional/cadastrarprofissional.php';
     }
@@ -85,6 +103,8 @@ class FuncionarioController
      */
     public function listar()
     {
+        $this->checarAdmin();
+        
         try {
             $funcionario = new Funcionario();
             $lista_funcionarios = $funcionario->listarTodos();
@@ -102,6 +122,8 @@ class FuncionarioController
      */
     public function mostrarEditar($id)
     {
+        $this->checarAdmin();
+        
         try {
             $funcionario = new Funcionario();
             
@@ -124,6 +146,8 @@ class FuncionarioController
      */
     public function atualizar($id)
     {
+        $this->checarAdmin();
+        
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: Index.php?acao=funcionario_editar_mostrar&id=" . $id);
             exit;
@@ -204,6 +228,8 @@ class FuncionarioController
      */
     public function excluir($id)
     {
+        $this->checarAdmin();
+        
         try {
             $funcionario = new Funcionario();
             

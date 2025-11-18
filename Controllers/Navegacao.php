@@ -9,12 +9,18 @@ require_once 'Controllers/UsuarioController.php';
 require_once 'Controllers/AgendamentoController.php';
 require_once 'Controllers/ServicoController.php';
 require_once 'Controllers/FuncionarioController.php';
+require_once 'Controllers/ClienteController.php';
+require_once 'Controllers/RelatorioController.php';
+require_once 'Controllers/DespesaController.php';
 
 // Instancia os controllers
 $userController = new UsuarioController();
 $agendamentoController = new AgendamentoController();
 $servicoController = new ServicoController();
 $funcionarioController = new FuncionarioController();
+$clienteController = new ClienteController();
+$relatorioController = new RelatorioController();
+$despesaController = new DespesaController();
 
 // Define a ação padrão (mostrar login) se nenhuma for especificada
 $acao = $_GET['acao'] ?? 'login_mostrar';
@@ -109,6 +115,14 @@ switch ($acao) {
     case 'agenda_profissional_mostrar':
         $agendamentoController->mostrarAgendaProfissional();
         break;
+    
+    case 'profissional_historico_cliente':
+        $agendamentoController->mostrarHistoricoCliente();
+        break;
+    
+    case 'cliente_historico_mostrar':
+        $agendamentoController->mostrarHistoricoClienteLogado();
+        break;
 
     // --- LÓGICA DE REDIRECIONAMENTO CORRIGIDA ---
     case 'confirmar':
@@ -147,7 +161,25 @@ switch ($acao) {
     case 'inicio_admin': // Rota adicionada para o dashboard de admin
         $userController->direcionarDashboard();
         break;
+    
+    // --- ROTAS DE RECEPCIONISTA ---
+    case 'inicio_recepcionista': // Dashboard da recepcionista
+        $userController->direcionarDashboard();
+        break;
         
+    case 'agendamento_recepcionista_mostrar': // Página de agendamento da recepcionista
+        $agendamentoController->mostrarAgendamentoRecepcionista();
+        break;
+        
+    case 'agendamento_recepcionista_salvar': // Salvar agendamento criado pela recepcionista
+        $agendamentoController->salvarAgendamentoRecepcionista();
+        break;
+        
+    case 'recepcionista_agenda_mostrar': // Consultar agenda completa do salão
+        $agendamentoController->mostrarAgendaRecepcionista();
+        break;
+        
+    // --- ROTAS DE SERVIÇOS ---
     case 'servico_listar':
         $servicoController->listar();
         break;
@@ -228,8 +260,64 @@ switch ($acao) {
         break;
         
     case 'cliente_listar':
-        // TODO: Criar ClienteController e implementar listagem
-        echo "Página 'Gerenciar Clientes' ainda não implementada.";
+        $clienteController->listar();
+        break;
+        
+    case 'recepcionista_cliente_cadastro_mostrar':
+        $clienteController->mostrarFormularioCadastroRecepcionista();
+        break;
+        
+    case 'recepcionista_cliente_cadastro_salvar':
+        $clienteController->salvarCadastroRecepcionista();
+        break;
+        
+    // --- ROTAS DE RELATÓRIOS (ADMIN) ---
+    case 'relatorio_financeiro_mostrar':
+        $relatorioController->mostrarRelatorioFinanceiro();
+        break;
+        
+    case 'relatorio_clientes_mostrar':
+        $relatorioController->mostrarRelatorioClientes();
+        break;
+
+    // --- ROTAS DE DESPESAS (ADMIN) ---
+    case 'despesa_listar':
+        $despesaController->listar();
+        break;
+
+    case 'despesa_formulario_cadastrar':
+        $despesaController->formularioCadastrar();
+        break;
+
+    case 'despesa_cadastrar':
+        $despesaController->cadastrar();
+        break;
+
+    case 'despesa_formulario_editar':
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $despesaController->formularioEditar($id);
+        } else {
+            header('Location: Index.php?acao=despesa_listar&status=erro_id');
+        }
+        break;
+
+    case 'despesa_editar':
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $despesaController->editar($id);
+        } else {
+            header('Location: Index.php?acao=despesa_listar&status=erro_id');
+        }
+        break;
+        
+    case 'despesa_excluir':
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $despesaController->excluir($id);
+        } else {
+            header('Location: Index.php?acao=despesa_listar&status=erro_id');
+        }
         break;
 
     // Ação padrão

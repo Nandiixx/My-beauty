@@ -1,106 +1,182 @@
 <?php
 // A variável $erro é definida pelo FuncionarioController caso a validação falhe.
-// (Não precisamos de lógica aqui, apenas exibir as variáveis que o Controller nos envia)
+$usuario_nome = $_SESSION['usuario_nome'] ?? 'Recepcionista';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyBeauty - Cadastrar Profissional</title>
+    <title>Cadastrar Profissional - MyBeauty</title>
     <link rel="icon" type="image/svg+xml" href="../../assets/images/favicon.svg">
-    <link rel="preload" as="image" href="../../assets/images/background.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
-    <script src="../../assets/js/script.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../../assets/js/navbar.js"></script>
 </head>
 <body>
-    <main class="auth-bg">
-        <section class="auth-wrapper register-page">
-            <div class="auth-card">
-                <div class="auth-brand">
-                    <div class="brand-logo" aria-hidden="true">
-                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 3c2.8 0 5 2.2 5 5 0 1.6-.8 3.1-2 4 2.8.4 5 2.8 5 5.7V19c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2v-1.3c0-2.9 2.2-5.3 5-5.7-1.2-.9-2-2.4-2-4 0-2.8 2.2-5 5-5Z" fill="currentColor"/>
-                        </svg>
+    <!-- Burger Menu Overlay -->
+    <div class="burger-menu-overlay" onclick="if(!document.body.classList.contains('menu-pinned')) { toggleBurgerMenu(); }"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <button class="navbar-burger" onclick="toggleBurgerMenu()" aria-label="Menu">
+                    <i data-lucide="menu"></i>
+                </button>
+                <a href="Index.php?acao=inicio" class="navbar-brand">
+                    <div class="navbar-brand__icon"><i data-lucide="sparkles"></i></div>
+                    <span>MyBeauty</span>
+                </a>
+            </div>
+            <div class="burger-menu">
+                <div class="burger-menu__header">
+                    <span class="burger-menu__title">Menu Recepcionista</span>
+                    <button class="burger-menu__pin" onclick="togglePinMenu()" aria-label="Fixar Menu">
+                        <i data-lucide="pin"></i>
+                    </button>
+                </div>
+                <div class="burger-menu__content">
+                    <a href="Index.php?acao=inicio" class="burger-menu__item">
+                        <i data-lucide="home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="Index.php?acao=agendamento_recepcionista_mostrar" class="burger-menu__item">
+                        <i data-lucide="calendar-plus"></i>
+                        <span>Agendar Serviço</span>
+                    </a>
+                    <a href="Index.php?acao=recepcionista_agenda_mostrar" class="burger-menu__item">
+                        <i data-lucide="calendar-search"></i>
+                        <span>Consultar Agenda</span>
+                    </a>
+                    <a href="Index.php?acao=funcionario_cadastro_mostrar" class="burger-menu__item burger-menu__item--active">
+                        <i data-lucide="user-plus"></i>
+                        <span>Cadastrar Profissional</span>
+                    </a>
+                    <a href="Index.php?acao=cliente_listar" class="burger-menu__item">
+                        <i data-lucide="users"></i>
+                        <span>Visualizar Clientes</span>
+                    </a>
+                    <div class="burger-menu__divider"></div>
+                    <a href="Index.php?acao=logout" class="burger-menu__item">
+                        <i data-lucide="log-out"></i>
+                        <span>Sair</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="navbar-actions">
+                <a href="Index.php?acao=funcionario_listar" class="btn-header btn-header--primary">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Voltar para Lista</span>
+                </a>
+                <div class="navbar-user" onclick="toggleUserMenu()">
+                    <div class="navbar-user__avatar">
+                        <?php echo strtoupper(substr($usuario_nome, 0, 1)); ?>
                     </div>
-                    <div>
-                        <h1 class="brand-title">Cadastrar Profissional</h1>
-                        <p class="brand-subtitle">Adicione um novo membro à equipe</p>
+                    <div class="navbar-user__info">
+                        <div class="navbar-user__name"><?php echo htmlspecialchars(explode(' ', $usuario_nome)[0]); ?></div>
+                        <div class="navbar-user__role">Recepcionista</div>
+                    </div>
+                    <div class="navbar-user__dropdown">
+                        <a href="#" class="navbar-user__dropdown-item">
+                            <i data-lucide="user"></i>
+                            <span>Meu Perfil</span>
+                        </a>
+                        <div class="navbar-user__dropdown-divider"></div>
+                        <a href="Index.php?acao=logout" class="navbar-user__dropdown-item">
+                            <i data-lucide="log-out"></i>
+                            <span>Sair</span>
+                        </a>
                     </div>
                 </div>
+            </div>
+        </div>
+    </nav>
 
-                <?php if (isset($erro)): ?>
-                    <div class="alert-error" role="alert"><?php echo htmlspecialchars($erro); ?></div>
-                <?php endif; ?>
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>
+                <i data-lucide="user-plus"></i>
+                Cadastrar Profissional
+            </h1>
+            <p>Adicione um novo membro à equipe</p>
+        </div>
 
-                <form class="auth-form form-grid-2" method="POST" action="../Index.php?acao=funcionario_salvar" novalidate>
-                    <div class="input-field">
-                        <span class="input-icon" aria-hidden="true">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5Z" fill="currentColor"/>
-                            </svg>
-                        </span>
+        <?php if (isset($erro)): ?>
+            <div class="alert alert-error" role="alert">
+                <i data-lucide="alert-circle"></i>
+                <p><?php echo htmlspecialchars($erro); ?></p>
+            </div>
+        <?php endif; ?>
+
+        <div class="section-card">
+            <div class="section-card__header">
+                <h2 class="section-card__title">
+                    <i data-lucide="user-check"></i>
+                    Dados do Profissional
+                </h2>
+            </div>
+
+            <form class="form-modern" method="POST" action="../Index.php?acao=funcionario_salvar" novalidate>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nome">
+                            <i data-lucide="user"></i>
+                            Nome Completo <span class="required">*</span>
+                        </label>
                         <input type="text" id="nome" name="nome" placeholder="Nome completo" required 
                                value="<?php echo isset($_POST['nome']) ? htmlspecialchars($_POST['nome']) : ''; ?>">
                     </div>
 
-                    <div class="input-field">
-                        <span class="input-icon" aria-hidden="true">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/>
-                            </svg>
-                        </span>
+                    <div class="form-group">
+                        <label for="email">
+                            <i data-lucide="mail"></i>
+                            E-mail <span class="required">*</span>
+                        </label>
                         <input type="email" id="email" name="email" placeholder="E-mail" required
                                value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
                     </div>
+                </div>
 
-                    <div class="input-field">
-                        <span class="input-icon" aria-hidden="true">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M17 8h-1V6a4 4 0 10-8 0v2H7a2 2 0 00-2 2v8a2 2 0 002 2h10a2 2 0 002-2v-8a2 2 0 00-2-2Z" fill="currentColor"/>
-                            </svg>
-                        </span>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="senha">
+                            <i data-lucide="lock"></i>
+                            Senha <span class="required">*</span>
+                        </label>
                         <input type="password" id="senha" name="senha" placeholder="Senha" required minlength="6">
-                        <button type="button" class="toggle-password" onclick="togglePassword('senha')" aria-label="Mostrar senha">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5ZM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5Zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3Z" fill="currentColor"/>
-                            </svg>
-                        </button>
+                        <small class="form-hint">Mínimo de 6 caracteres</small>
                     </div>
 
-                    <div class="input-field">
-                        <span class="input-icon" aria-hidden="true">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M17 8h-1V6a4 4 0 10-8 0v2H7a2 2 0 00-2 2v8a2 2 0 002 2h10a2 2 0 002-2v-8a2 2 0 00-2-2Z" fill="currentColor"/>
-                            </svg>
-                        </span>
+                    <div class="form-group">
+                        <label for="confirma_senha">
+                            <i data-lucide="lock-keyhole"></i>
+                            Confirmar Senha <span class="required">*</span>
+                        </label>
                         <input type="password" id="confirma_senha" name="confirma_senha" placeholder="Confirmar senha" required minlength="6">
-                        <button type="button" class="toggle-password" onclick="togglePassword('confirma_senha')" aria-label="Mostrar senha">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5ZM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5Zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3Z" fill="currentColor"/>
-                            </svg>
-                        </button>
                     </div>
+                </div>
 
-                    <div class="input-field">
-                        <span class="input-icon" aria-hidden="true">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
-                            </svg>
-                        </span>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="matricula">
+                            <i data-lucide="badge-check"></i>
+                            Matrícula <span class="required">*</span>
+                        </label>
                         <input type="text" id="matricula" name="matricula" placeholder="Matrícula" required
                                value="<?php echo isset($_POST['matricula']) ? htmlspecialchars($_POST['matricula']) : ''; ?>">
                     </div>
 
-                    <div class="input-field">
-                        <span class="input-icon" aria-hidden="true">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="currentColor"/>
-                            </svg>
-                        </span>
+                    <div class="form-group">
+                        <label for="cargo">
+                            <i data-lucide="briefcase"></i>
+                            Cargo <span class="required">*</span>
+                        </label>
                         <select name="cargo" id="cargo" required>
                             <option value="">Selecione um cargo</option>
                             <option value="PROFISSIONAL_BELEZA" <?php echo (isset($_POST['cargo']) && $_POST['cargo'] === 'PROFISSIONAL_BELEZA') ? 'selected' : ''; ?>>
@@ -117,30 +193,39 @@
                             </option>
                         </select>
                     </div>
+                </div>
 
-                    <div class="input-field" style="grid-column: 1 / -1;">
-                        <span class="input-icon" aria-hidden="true">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
-                            </svg>
-                        </span>
+                <div class="form-row">
+                    <div class="form-group form-group--full">
+                        <label for="especialidade">
+                            <i data-lucide="star"></i>
+                            Especialidade
+                        </label>
                         <input type="text" id="especialidade" name="especialidade" placeholder="Especialidade (opcional)"
                                value="<?php echo isset($_POST['especialidade']) ? htmlspecialchars($_POST['especialidade']) : ''; ?>">
+                        <small class="form-hint">Campo opcional</small>
                     </div>
-
-                    <button type="submit" class="btn-primary" data-loading="false" aria-busy="false" style="grid-column: 1 / -1;">
-                        <span class="btn-label">Cadastrar Profissional</span>
-                        <span class="btn-spinner" aria-hidden="true"></span>
-                    </button>
-                </form>
-
-                <div class="auth-divider" role="separator"></div>
-
-                <div class="auth-cta">
-                    <p class="auth-cta-text"><a class="auth-cta-link" href="../Index.php?acao=funcionario_listar"><strong>← Voltar para lista</strong></a></p>
                 </div>
-            </div>
-        </section>
-    </main>
+
+                <div class="form-actions">
+                    <a href="Index.php?acao=funcionario_listar" class="btn-secondary">
+                        <i data-lucide="x"></i>
+                        <span>Cancelar</span>
+                    </a>
+                    <button type="submit" class="btn-primary">
+                        <i data-lucide="user-plus"></i>
+                        <span>Cadastrar Profissional</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar ícones Lucide após o DOM carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+    </script>
 </body>
 </html>

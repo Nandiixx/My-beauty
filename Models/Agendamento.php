@@ -339,5 +339,50 @@ class Agendamento
             return false;
         }
     }
+
+    /**
+     * Lista o histórico de serviços concluídos de um cliente específico
+     * @param int $cliente_id O ID do cliente
+     * @return array Lista de agendamentos concluídos
+     */
+    public function listarHistoricoCliente($cliente_id)
+    {
+        require_once __DIR__ . '/ConexaoDB.php';
+        try {
+            $pdo = ConexaoDB::getConnection();
+            $lista = [];
+
+            $sql = "SELECT 
+                        a.id,
+                        c_user.nome AS cliente_nome,
+                        f_user.nome AS profissional_nome,
+                        GROUP_CONCAT(s.nome SEPARATOR ', ') AS servicos,
+                        a.data_hora,
+                        a.status
+                    FROM Agendamento a
+                    JOIN Cliente c ON a.cliente_id = c.id
+                    JOIN Usuario c_user ON c.usuario_id = c_user.id
+                    JOIN Funcionario f ON a.profissional_id = f.id
+                    JOIN Usuario f_user ON f.usuario_id = f_user.id
+                    JOIN Agendamento_Servicos asv ON a.id = asv.agendamento_id
+                    JOIN Servico s ON asv.servico_id = s.id
+                    WHERE c.id = :cliente_id AND a.status = 'CONCLUIDO'
+                    GROUP BY a.id
+                    ORDER BY a.data_hora DESC";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([':cliente_id' => $cliente_id]);
+            
+            while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
+                $lista[] = $row;
+            }
+            
+            return $lista;
+
+        } catch (Exception $e) {
+            error_log("Error in listarHistoricoCliente: " . $e->getMessage());
+            return [];
+        }
+    }
 }
 ?>

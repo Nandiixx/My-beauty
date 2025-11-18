@@ -440,7 +440,8 @@ $usuario_nome = $_SESSION['usuario_nome'] ?? 'Profissional';
                 flex-direction: column;
                 width: 100%;
             }
-    </script>
+        }
+    </style>
 </head>
 <body>
     <!-- Burger Menu Overlay -->
@@ -603,5 +604,10 @@ $usuario_nome = $_SESSION['usuario_nome'] ?? 'Profissional';
             <?php endif; ?>
         </div>
     </div>
+
+    <script>
+        // Inicializa os ícones do Lucide
+        lucide.createIcons();
+    </script>
 </body>
 </html>

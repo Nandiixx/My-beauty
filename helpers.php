@@ -78,4 +78,48 @@ function verificarCargo($cargos) {
     }
     return in_array($_SESSION['usuario_cargo'], (array)$cargos);
 }
+
+/**
+ * Retorna o texto descritivo de um cargo
+ * 
+ * @param string $cargo Código do cargo
+ * @return string Descrição do cargo
+ */
+function cargoTexto($cargo) {
+    $cargos = [
+        'PROFISSIONAL_BELEZA' => 'Profissional de Beleza',
+        'RECEPCIONISTA' => 'Recepcionista',
+        'PROPRIETARIO' => 'Proprietário',
+        'GERENTE_FINANCEIRO' => 'Gerente Financeiro'
+    ];
+    return $cargos[$cargo] ?? $cargo;
+}
+
+/**
+ * Retorna a classe CSS para badge de cargo
+ * 
+ * @param string $cargo Código do cargo
+ * @return string Classe CSS do badge
+ */
+function cargoBadge($cargo) {
+    $badges = [
+        'PROFISSIONAL_BELEZA' => 'badge-primary',
+        'RECEPCIONISTA' => 'badge-info',
+        'PROPRIETARIO' => 'badge-warning',
+        'GERENTE_FINANCEIRO' => 'badge-success'
+    ];
+    return $badges[$cargo] ?? 'badge-secondary';
+}
+
+/**
+ * Formata data para input datetime-local
+ * 
+ * @param string $data_hora Data/hora no formato Y-m-d H:i:s
+ * @return string Data formatada para input (Y-m-d\TH:i)
+ */
+function formatarDataParaInput($data_hora) {
+    // Converte do formato do banco (YYYY-MM-DD HH:MM:SS) para o formato do input datetime-local (YYYY-MM-DDTHH:MM)
+    $dt = new DateTime($data_hora);
+    return $dt->format('Y-m-d\TH:i');
+}
 ?>

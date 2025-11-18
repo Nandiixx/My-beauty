@@ -1,32 +1,11 @@
 <?php
-// Inicia a sessão se já não estiver iniciada
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 // As variáveis $lista_profissionais, $lista_servicos e $lista_agendamentos
 // são fornecidas pelo AgendamentoController::index()
 
 $usuario_nome = $_SESSION['usuario_nome'] ?? 'Cliente';
 
-function formatarData($data_hora) {
-    $dt = new DateTime($data_hora);
-    return [
-        'dia' => $dt->format('d'),
-        'mes' => $dt->format('M'),
-        'hora' => $dt->format('H:i'),
-        'data_completa' => $dt->format('d/m/Y'),
-        'dia_semana' => ucfirst($dt->format('l'))
-    ];
-}
-
-function statusBadge($status) {
-    $badges = [
-        'AGENDADO' => ['class' => 'status-badge--agendado', 'texto' => 'Agendado'],
-        'CONCLUIDO' => ['class' => 'status-badge--concluido', 'texto' => 'Concluído'],
-        'CANCELADO' => ['class' => 'status-badge--cancelado', 'texto' => 'Cancelado']
-    ];
-    return $badges[$status] ?? ['class' => '', 'texto' => $status];
-}
+// Inclui helpers para formatação
+require_once __DIR__ . '/../../helpers.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -385,18 +364,38 @@ function statusBadge($status) {
                             <div class="agendamento-item__header">
                                 <div class="agendamento-item__content">
                                     <h3 class="agendamento-item__title">
-                                        <i data-lucide="scissors"></i>
-                                        <?php echo htmlspecialchars($a->servicos ?? 'Serviço'); ?>
+                                        <i data-lucide="calendar-check"></i>
+                                        Agendamento #<?php echo htmlspecialchars($a->id); ?>
                                     </h3>
+                                    
+                                    <div class="agendamento-servicos">
+                                        <?php 
+                                        // Divide os serviços e cria badges individuais
+                                        $servicos_array = explode(', ', $a->servicos ?? 'Serviço');
+                                        foreach($servicos_array as $servico_nome): 
+                                        ?>
+                                            <span class="servico-badge">
+                                                <i data-lucide="scissors"></i>
+                                                <?php echo htmlspecialchars(trim($servico_nome)); ?>
+                                            </span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    
                                     <p class="agendamento-item__details">
                                         <strong>
                                             <i data-lucide="user"></i>
                                             Cliente:
-                                        </strong> <?php echo htmlspecialchars($a->cliente_nome ?? 'N/A'); ?><br>
+                                        </strong> <?php echo htmlspecialchars($a->cliente_nome ?? 'N/A'); ?>
+                                    </p>
+                                    <p class="agendamento-item__details">
                                         <strong>
                                             <i data-lucide="calendar"></i>
                                             Data:
-                                        </strong> <?php echo $data['data_completa']; ?> às <?php echo $data['hora']; ?>
+                                        </strong> <?php echo $data['data_completa']; ?>
+                                        <strong class="ml-1">
+                                            <i data-lucide="clock"></i>
+                                            Horário:
+                                        </strong> <?php echo $data['hora']; ?>
                                     </p>
                                 </div>
                                 <div class="agendamento-item__actions">

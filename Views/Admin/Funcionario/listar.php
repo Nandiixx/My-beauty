@@ -14,10 +14,10 @@
 -->
 <?php
 // Esta view está temporariamente desabilitada até a refatoração
-echo "<div style='padding: 2rem; background: #fee; color: #900; border: 2px solid #c00; margin: 2rem; border-radius: 8px;'>";
+echo "<div class='deprecated-warning'>";
 echo "<h2>⚠️ Página em Refatoração</h2>";
 echo "<p>Esta funcionalidade está sendo refatorada para seguir o padrão MVC do projeto.</p>";
-echo "<p><a href='../Index.php?acao=inicio_admin' style='color: #900; text-decoration: underline;'>← Voltar ao Dashboard</a></p>";
+echo "<p><a href='../Index.php?acao=inicio_admin'>← Voltar ao Dashboard</a></p>";
 echo "</div>";
 exit;
 ?>
@@ -28,8 +28,8 @@ exit;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciar Agendamentos</title>
     <link rel="stylesheet" href="/style.css">
-    <!-- Adiciona Font Awesome para ícones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Adiciona Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <div class="container">
@@ -169,15 +169,18 @@ exit;
                                 <td>${agendamento.status}</td>
                                 <td>
                                     <button onclick="mostrarModalAgendamento(${agendamento.id})" class="btn-edit">
-                                        <i class="fas fa-edit"></i>
+                                        <i data-lucide="pencil"></i>
                                     </button>
                                     <button onclick="excluirAgendamento(${agendamento.id})" class="btn-delete">
-                                        <i class="fas fa-trash"></i>
+                                        <i data-lucide="trash-2"></i>
                                     </button>
                                 </td>
                             `;
                             tbody.appendChild(tr);
                         });
+                        
+                        // Reinicializa os ícones Lucide após adicionar conteúdo dinâmico
+                        lucide.createIcons();
                     }
                 });
         }
@@ -301,6 +304,8 @@ exit;
         document.addEventListener('DOMContentLoaded', function() {
             carregarDadosSelects();
             carregarAgendamentos();
+            // Inicializa os ícones Lucide
+            lucide.createIcons();
         });
     </script>
 </body>

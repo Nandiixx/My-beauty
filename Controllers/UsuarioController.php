@@ -105,7 +105,7 @@ class UsuarioController
             $_SESSION['usuario_id'] = $usuario->getId();
             $_SESSION['usuario_nome'] = $usuario->getNome();
 
-            // 3. Verifica se é um Funcionário (Admin ou Profissional)
+            // 3. Verifica se é um Funcionário (Admin, Profissional ou Recepcionista)
             $funcionario = new Funcionario();
             if ($funcionario->carregarFuncionarioPorUsuarioId($usuario->getId())) {
                 
@@ -113,10 +113,14 @@ class UsuarioController
                 $_SESSION['funcionario_id'] = $funcionario->getId();
                 $_SESSION['usuario_cargo'] = $cargo; // Salva o cargo (ex: 'PROFISSIONAL_BELEZA')
 
-                // Diferencia Admin de Profissional
+                // Diferencia Admin, Recepcionista e Profissional
                 if (in_array($cargo, ['PROPRIETARIO', 'GERENTE_FINANCEIRO'])) {
                     $_SESSION['usuario_tipo'] = 'ADMIN';
                     header('Location: Index.php?acao=inicio_admin'); 
+                    exit;
+                } else if ($cargo === 'RECEPCIONISTA') {
+                    $_SESSION['usuario_tipo'] = 'RECEPCIONISTA';
+                    header('Location: Index.php?acao=inicio_recepcionista'); 
                     exit;
                 } else {
                     $_SESSION['usuario_tipo'] = 'PROFISSIONAL';
@@ -165,6 +169,10 @@ class UsuarioController
             // Se for admin, chama o método específico
             $this->mostrarDashboardAdmin();
                 
+        } else if ($tipo == 'RECEPCIONISTA') {
+            // Se for recepcionista, chama o método específico
+            $this->mostrarDashboardRecepcionista();
+            
         } else if ($tipo == 'PROFISSIONAL') {
             // Se for profissional, redireciona para o controller de agendamento
             $agendamentoController = new AgendamentoController();
@@ -244,6 +252,71 @@ class UsuarioController
         
         // Inclui a View
         require_once __DIR__ . '/../Views/Admin/inicio_admi.php';
+    }
+    
+    /**
+     * Mostra o dashboard da recepcionista com estatísticas
+     * Processa toda a lógica de negócio antes de passar para a View
+     */
+    public function mostrarDashboardRecepcionista()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        // Verifica se é recepcionista
+        if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_cargo'] !== 'RECEPCIONISTA') {
+            header("Location: Index.php?acao=login_mostrar");
+            exit;
+        }
+        
+        $nomeUsuario = $_SESSION['usuario_nome'] ?? 'Recepcionista';
+        $cargo = $_SESSION['usuario_cargo'] ?? 'Recepcionista';
+        
+        // Buscar estatísticas usando consultas diretas
+        try {
+            $pdo = ConexaoDB::getConnection();
+            
+            // Total de clientes
+            $stmt = $pdo->query("SELECT COUNT(*) as total FROM Cliente");
+            $total_clientes = $stmt->fetch()['total'] ?? 0;
+            
+            // Total de profissionais
+            $stmt = $pdo->query("SELECT COUNT(*) as total FROM Funcionario WHERE cargo = 'PROFISSIONAL_BELEZA'");
+            $total_profissionais = $stmt->fetch()['total'] ?? 0;
+            
+            // Total de agendamentos hoje
+            $stmt = $pdo->query("SELECT COUNT(*) as total FROM Agendamento WHERE DATE(data_hora) = CURDATE()");
+            $agendamentos_hoje = $stmt->fetch()['total'] ?? 0;
+            
+            // Total de agendamentos pendentes
+            $stmt = $pdo->query("SELECT COUNT(*) as total FROM Agendamento WHERE status = 'AGENDADO'");
+            $agendamentos_pendentes = $stmt->fetch()['total'] ?? 0;
+            
+            // Prepara dados para a View
+            $dados = [
+                'nomeUsuario' => $nomeUsuario,
+                'cargo' => $cargo,
+                'total_clientes' => $total_clientes,
+                'total_profissionais' => $total_profissionais,
+                'agendamentos_hoje' => $agendamentos_hoje,
+                'agendamentos_pendentes' => $agendamentos_pendentes
+            ];
+            
+        } catch (Exception $e) {
+            // Em caso de erro, define valores padrão
+            $dados = [
+                'nomeUsuario' => $nomeUsuario,
+                'cargo' => $cargo,
+                'total_clientes' => 0,
+                'total_profissionais' => 0,
+                'agendamentos_hoje' => 0,
+                'agendamentos_pendentes' => 0
+            ];
+        }
+        
+        // Inclui a View
+        require_once __DIR__ . '/../Views/Recepcionista/inicio_recepcionista.php';
     }
 
     /**

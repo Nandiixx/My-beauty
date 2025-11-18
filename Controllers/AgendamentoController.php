@@ -541,5 +541,202 @@ class AgendamentoController
             exit;
         }
     }
+    
+    /**
+     * Exibe a página de agendamento para recepcionista (com seleção de cliente)
+     */
+    public function mostrarAgendamentoRecepcionista()
+    {
+        // Requer login de Recepcionista
+        if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] != 'RECEPCIONISTA') {
+            header('Location: Index.php?acao=login_mostrar');
+            exit;
+        }
+        
+        // --- Carrega dados para a View ---
+        
+        // 1. Carrega lista de serviços
+        $servicoModel = new Servico();
+        $lista_servicos = $servicoModel->listarTodos();
+        
+        // 2. Carrega lista de profissionais
+        $funcModel = new Funcionario();
+        $lista_profissionais = $funcModel->listarTodosProfissionais();
+        
+        // 3. Carrega lista de clientes para o dropdown
+        require_once __DIR__ . '/../Models/Cliente.php';
+        $clienteModel = new Cliente();
+        $lista_clientes = $clienteModel->listarTodos();
+        
+        // --- Inclui a View ---
+        include_once __DIR__ . '/../Views/Recepcionista/agendamento.php';
+    }
+    
+    /**
+     * Salva agendamento criado pela recepcionista em nome de um cliente
+     */
+    public function salvarAgendamentoRecepcionista()
+    {
+        // Requer login de Recepcionista
+        if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] != 'RECEPCIONISTA') {
+            header('Location: Index.php?acao=login_mostrar');
+            exit;
+        }
+
+        $erros = []; // Array para armazenar os erros de validação
+
+        // 1. Validação dos dados de entrada (POST)
+        if (empty($_POST['cliente_id'])) {
+            $erros[] = "Você deve selecionar um cliente.";
+        }
+        if (empty($_POST['profissional_id'])) {
+            $erros[] = "Você deve selecionar um profissional.";
+        }
+        if (empty($_POST['dataHora'])) {
+            $erros[] = "Você deve selecionar uma data e hora.";
+        }
+        if (empty($_POST['servico_id'])) {
+            $erros[] = "Você deve selecionar um serviço.";
+        }
+
+        // 2. Se houver erros, armazena na sessão e redireciona de volta
+        if (!empty($erros)) {
+            $_SESSION['erros_agendamento'] = $erros;
+            header('Location: Index.php?acao=agendamento_recepcionista_mostrar');
+            exit;
+        }
+
+        // 3. Se a validação passou, continua com o processo
+        try {
+            $agendamento = new Agendamento();
+            
+            // Define os dados do agendamento usando o cliente_id do formulário
+            $agendamento->setClienteId((int)$_POST['cliente_id']);
+            $agendamento->setProfissionalId((int)$_POST['profissional_id']);
+            $agendamento->setDataHora($_POST['dataHora']);
+            
+            // Adiciona o serviço único
+            $agendamento->addServico((int)$_POST['servico_id']);
+
+            // Salva no banco
+            if ($agendamento->inserirBD()) {
+                $_SESSION['sucesso_agendamento'] = "Agendamento realizado com sucesso!";
+                header('Location: Index.php?acao=agendamento_recepcionista_mostrar');
+                exit;
+            } else {
+                $_SESSION['erros_agendamento'] = ["Erro ao salvar o agendamento no banco de dados."];
+                header('Location: Index.php?acao=agendamento_recepcionista_mostrar');
+                exit;
+            }
+        } catch (Exception $e) {
+            // Captura exceções (ex: erro de conexão ou SQL)
+            $_SESSION['erros_agendamento'] = ["Erro inesperado no servidor: " . $e->getMessage()];
+            header('Location: Index.php?acao=agendamento_recepcionista_mostrar');
+            exit;
+        }
+    }
+    
+    /**
+     * Mostra o histórico de serviços de um cliente específico para o profissional
+     */
+    public function mostrarHistoricoCliente()
+    {
+        // Requer login de Profissional
+        if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] != 'PROFISSIONAL') {
+            header('Location: Index.php?acao=login_mostrar');
+            exit;
+        }
+        
+        // Carrega lista de clientes para o dropdown
+        require_once __DIR__ . '/../Models/Cliente.php';
+        $clienteModel = new Cliente();
+        $lista_clientes = $clienteModel->listarTodos();
+        
+        // Verifica se foi selecionado um cliente
+        $cliente_selecionado = $_GET['cliente_id'] ?? null;
+        $historico = [];
+        $cliente_nome = '';
+        
+        if ($cliente_selecionado) {
+            $agendamentoModel = new Agendamento();
+            $historico = $agendamentoModel->listarHistoricoCliente((int)$cliente_selecionado);
+            
+            // Busca o nome do cliente selecionado
+            foreach ($lista_clientes as $cliente) {
+                if ($cliente->id == $cliente_selecionado) {
+                    $cliente_nome = $cliente->nome;
+                    break;
+                }
+            }
+        }
+        
+        // Prepara dados para a View
+        $dados = [
+            'lista_clientes' => $lista_clientes,
+            'cliente_selecionado' => $cliente_selecionado,
+            'cliente_nome' => $cliente_nome,
+            'historico' => $historico
+        ];
+        
+        // Inclui a View
+        include_once __DIR__ . '/../Views/Profissional/historico_cliente.php';
+    }
+    
+    /**
+     * Mostra o histórico de serviços do cliente logado (Visão do Cliente)
+     */
+    public function mostrarHistoricoClienteLogado()
+    {
+        // Requer login de Cliente
+        if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] != 'CLIENTE') {
+            header('Location: Index.php?acao=login_mostrar');
+            exit;
+        }
+        
+        $agendamentoModel = new Agendamento();
+        $cliente_id = $_SESSION['cliente_id'] ?? null;
+        
+        // Busca o histórico de serviços concluídos do cliente
+        $historico = [];
+        if ($cliente_id) {
+            $historico = $agendamentoModel->listarHistoricoCliente((int)$cliente_id);
+        }
+        
+        // Prepara dados para a View
+        $dados = [
+            'historico' => $historico,
+            'usuario_nome' => $_SESSION['usuario_nome'] ?? 'Cliente'
+        ];
+        
+        // Inclui a View
+        require_once __DIR__ . '/../Views/Cliente/historico.php';
+    }
+    
+    /**
+     * Mostra a agenda completa do salão para a Recepcionista
+     * Permite visualizar agendamentos de todos os profissionais
+     */
+    public function mostrarAgendaRecepcionista()
+    {
+        // Requer login de Recepcionista
+        if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] != 'RECEPCIONISTA') {
+            header('Location: Index.php?acao=login_mostrar');
+            exit;
+        }
+        
+        $agendamentoModel = new Agendamento();
+        
+        // Usa o método listarTodos() para obter todos os agendamentos
+        $lista_agenda_completa = $agendamentoModel->listarTodos();
+        
+        // Prepara dados para a View
+        $dados = [
+            'lista_agenda_completa' => $lista_agenda_completa,
+            'usuario_nome' => $_SESSION['usuario_nome'] ?? 'Recepcionista'
+        ];
+        
+        // Inclui a View
+        require_once __DIR__ . '/../Views/Recepcionista/agenda_completa.php';
+    }
 }
 ?>

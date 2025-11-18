@@ -1,19 +1,11 @@
 <?php
-// Inicia a sessão se já não estiver iniciada
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 // As variáveis $agendamento, $lista_profissionais e $lista_servicos
 // são fornecidas pelo AgendamentoController::mostrarFormularioEdicao()
 
 $usuario_nome = $_SESSION['usuario_nome'] ?? 'Cliente';
 
-function formatarDataParaInput($data_hora) {
-    // Converte do formato do banco (YYYY-MM-DD HH:MM:SS) para o formato do input datetime-local (YYYY-MM-DDTHH:MM)
-    $dt = new DateTime($data_hora);
-    return $dt->format('Y-m-d\TH:i');
-}
+// Inclui helpers para formatação
+require_once __DIR__ . '/../../helpers.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -262,6 +254,10 @@ function formatarDataParaInput($data_hora) {
                         <i data-lucide="clipboard-list"></i>
                         <span>Gerenciar Agendamentos</span>
                     </a>
+                    <a href="Index.php?acao=cliente_historico_mostrar" class="burger-menu__item">
+                        <i data-lucide="history"></i>
+                        <span>Meu Histórico</span>
+                    </a>
                     <a href="Index.php?acao=perfil_mostrar" class="burger-menu__item">
                         <i data-lucide="user"></i>
                         <span>Meu Perfil</span>
@@ -301,6 +297,10 @@ function formatarDataParaInput($data_hora) {
                             <i data-lucide="clipboard-list"></i>
                             <span>Gerenciar Agendamentos</span>
                         </a>
+                        <a href="Index.php?acao=cliente_historico_mostrar" class="navbar-user__dropdown-item">
+                            <i data-lucide="history"></i>
+                            <span>Meu Histórico</span>
+                        </a>
                         <div class="navbar-user__dropdown-divider"></div>
                         <a href="Index.php?acao=logout" class="navbar-user__dropdown-item">
                             <i data-lucide="log-out"></i>
@@ -327,7 +327,7 @@ function formatarDataParaInput($data_hora) {
             </div>
         </div>
 
-        <div class="section-card" style="max-width: 800px; margin: 0 auto;">
+        <div class="section-card section-card-centered">
             <div class="section-card__header">
                 <h2 class="section-card__title">
                     <i data-lucide="file-edit"></i>

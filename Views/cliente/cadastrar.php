@@ -37,7 +37,7 @@
                     <div class="alert-error" role="alert"><?php echo htmlspecialchars($erro); ?></div>
                 <?php endif; ?>
 
-                <form class="auth-form form-grid-2" method="POST" action="../index.php?acao=salvar_cliente" novalidate>
+                <form class="auth-form form-grid-2" method="POST" action="Index.php?acao=salvar_cliente" novalidate>
                     <div class="input-field">
                         <span class="input-icon" aria-hidden="true">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -105,7 +105,7 @@
                 <div class="auth-divider" role="separator"></div>
 
                 <div class="auth-cta">
-                    <p class="auth-cta-text">Já tem uma conta? <a class="auth-cta-link" href="../index.php?acao=login_mostrar"><strong>Entrar</strong></a></p>
+                    <p class="auth-cta-text">Já tem uma conta? <a class="auth-cta-link" href="Index.php?acao=login_mostrar"><strong>Entrar</strong></a></p>
                 </div>
             </div>
         </section>

@@ -20,8 +20,8 @@ if (empty($email)) {
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="style.css">
-	<script src="script.js"></script>
+	<link rel="stylesheet" href="../../assets/css/style.css">
+	<script src="../../assets/js/script.js"></script>
 </head>
 <body>
 	<main class="auth-bg">

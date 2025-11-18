@@ -1046,6 +1046,44 @@ body.menu-pinned .navbar-burger {
   gap: 0.3rem;
 }
 
+/* Estilos para container de serviços */
+.agendamento-servicos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0 1rem 0;
+}
+
+/* Badge de serviço individual */
+.servico-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.15));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: rgba(255, 255, 255, 0.95);
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+}
+
+.servico-badge:hover {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(99, 102, 241, 0.25));
+  border-color: rgba(139, 92, 246, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+.servico-badge i {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-shrink: 0;
+  color: #a78bfa;
+}
+
 .status-badge {
   display: inline-block;
   padding: 0.5rem 1rem;
@@ -2935,5 +2973,128 @@ main[style*="padding"] {
   .btn-action {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* ====================================
+   Classes para substituir estilos in-line
+   ==================================== */
+
+/* Grid column spanning - útil para formulários */
+.grid-col-full {
+  grid-column: 1 / -1;
+}
+
+/* Spacing utilities */
+.mt-1 {
+  margin-top: 1rem;
+}
+
+.mt-1-5 {
+  margin-top: 1.5rem;
+}
+
+.mb-2 {
+  margin-bottom: 2rem;
+}
+
+.ml-1 {
+  margin-left: 1rem;
+}
+
+/* Text alignment */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* Display utilities */
+.display-inline-flex {
+  display: inline-flex;
+}
+
+.display-none {
+  display: none;
+}
+
+/* Layout específico - duas colunas */
+.layout-two-cols {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+/* Stats grid com 2 colunas */
+.stats-grid-two-cols {
+  grid-template-columns: repeat(2, 1fr);
+  margin-bottom: 2rem;
+}
+
+/* Seção centralizada com largura máxima */
+.section-card-centered {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Divisor de seção com bordas */
+.form-section-divider {
+  grid-column: 1 / -1;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 1rem 0;
+}
+
+/* Label de seção */
+.form-section-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* Row de total em tabelas */
+.table-total-row {
+  font-weight: bold;
+  background-color: var(--color-background-secondary);
+}
+
+/* Padding para colunas de total */
+.table-total-cell {
+  text-align: right;
+  padding-right: 1rem;
+}
+
+/* Badge com tamanho maior */
+.badge-large {
+  font-size: 1.1rem;
+}
+
+/* Mensagem de erro/aviso (arquivos deprecados) */
+.deprecated-warning {
+  padding: 2rem;
+  background: #fee;
+  color: #900;
+  border: 2px solid #c00;
+  margin: 2rem;
+  border-radius: 8px;
+}
+
+.deprecated-warning a {
+  color: #900;
+  text-decoration: underline;
+}
+
+/* Responsividade para layout de duas colunas */
+@media (max-width: 768px) {
+  .layout-two-cols {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid-two-cols {
+    grid-template-columns: 1fr;
   }
 }

@@ -13,10 +13,10 @@
 -->
 <?php
 // Esta view está temporariamente desabilitada até a refatoração
-echo "<div style='padding: 2rem; background: #fee; color: #900; border: 2px solid #c00; margin: 2rem; border-radius: 8px;'>";
+echo "<div class='deprecated-warning'>";
 echo "<h2>⚠️ Página em Refatoração</h2>";
 echo "<p>Esta funcionalidade está sendo refatorada para seguir o padrão MVC do projeto.</p>";
-echo "<p><a href='../Index.php?acao=inicio_admin' style='color: #900; text-decoration: underline;'>← Voltar ao Dashboard</a></p>";
+echo "<p><a href='../Index.php?acao=inicio_admin'>← Voltar ao Dashboard</a></p>";
 echo "</div>";
 exit;
 ?>

@@ -1,9 +1,4 @@
 <?php
-// Inicia a sessão se já não estiver iniciada
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 // A variável $usuario é fornecida pelo UsuarioController::mostrarPerfil()
 $usuario_nome = $_SESSION['usuario_nome'] ?? 'Usuário';
 $usuario_tipo = $_SESSION['usuario_tipo'] ?? 'CLIENTE';
@@ -273,6 +268,10 @@ $usuario_tipo = $_SESSION['usuario_tipo'] ?? 'CLIENTE';
                         <i data-lucide="clipboard-list"></i>
                         <span>Gerenciar Agendamentos</span>
                     </a>
+                    <a href="Index.php?acao=cliente_historico_mostrar" class="burger-menu__item">
+                        <i data-lucide="history"></i>
+                        <span>Meu Histórico</span>
+                    </a>
                     <?php endif; ?>
                     <a href="Index.php?acao=perfil_mostrar" class="burger-menu__item">
                         <i data-lucide="user"></i>
@@ -312,6 +311,10 @@ $usuario_tipo = $_SESSION['usuario_tipo'] ?? 'CLIENTE';
                         <a href="Index.php?acao=gerenciar_agendamento_mostrar" class="navbar-user__dropdown-item">
                             <i data-lucide="clipboard-list"></i>
                             <span>Gerenciar Agendamentos</span>
+                        </a>
+                        <a href="Index.php?acao=cliente_historico_mostrar" class="navbar-user__dropdown-item">
+                            <i data-lucide="history"></i>
+                            <span>Meu Histórico</span>
                         </a>
                         <?php endif; ?>
                         <div class="navbar-user__dropdown-divider"></div>
@@ -445,7 +448,7 @@ $usuario_tipo = $_SESSION['usuario_tipo'] ?? 'CLIENTE';
                         </label>
                     </div>
 
-                    <div id="senha-fields" style="display: none;">
+                    <div id="senha-fields" class="display-none">
                         <div class="form-group">
                             <label for="senha_atual">
                                 <i data-lucide="key"></i>
@@ -540,7 +543,7 @@ $usuario_tipo = $_SESSION['usuario_tipo'] ?? 'CLIENTE';
                     </div>
                 </div>
 
-                <div class="alert alert-info" role="alert" style="margin-top: 1.5rem;">
+                <div class="alert alert-info mt-1-5" role="alert">
                     <i data-lucide="info"></i>
                     <div>
                         <strong>Dica de Segurança:</strong> Recomendamos alterar sua senha regularmente e nunca compartilhá-la com outras pessoas.

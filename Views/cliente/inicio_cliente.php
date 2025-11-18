@@ -242,6 +242,10 @@ $total_agendados = $dados['total_agendados'] ?? 0;
                             <i data-lucide="calendar"></i>
                             <span>Agendamentos</span>
                         </a>
+                        <a href="Index.php?acao=cliente_historico_mostrar" class="burger-menu__item">
+                            <i data-lucide="history"></i>
+                            <span>Meu Histórico</span>
+                        </a>
                         <a href="Index.php?acao=perfil_mostrar" class="burger-menu__item">
                             <i data-lucide="user"></i>
                             <span>Meu Perfil</span>
@@ -276,6 +280,10 @@ $total_agendados = $dados['total_agendados'] ?? 0;
                             <a href="Index.php?acao=agendamento_criar" class="navbar-user__dropdown-item">
                                 <i data-lucide="calendar"></i>
                                 <span>Meus Agendamentos</span>
+                            </a>
+                            <a href="Index.php?acao=cliente_historico_mostrar" class="navbar-user__dropdown-item">
+                                <i data-lucide="history"></i>
+                                <span>Meu Histórico</span>
                             </a>
                             <div class="navbar-user__dropdown-divider"></div>
                             <a href="Index.php?acao=logout" class="navbar-user__dropdown-item">
@@ -341,7 +349,19 @@ $total_agendados = $dados['total_agendados'] ?? 0;
                                             <div class="date-badge__month"><?php echo $data['mes']; ?></div>
                                         </div>
                                         <div class="agendamento-item__info">
-                                            <h3 class="agendamento-item__title"><?php echo htmlspecialchars($agendamento->servicos ?? 'Serviço'); ?></h3>
+                                            <h3 class="agendamento-item__title">Agendamento #<?php echo htmlspecialchars($agendamento->id); ?></h3>
+                                            <div class="agendamento-servicos">
+                                                <?php 
+                                                // Divide os serviços e cria badges individuais
+                                                $servicos_array = explode(', ', $agendamento->servicos ?? 'Serviço');
+                                                foreach($servicos_array as $servico_nome): 
+                                                ?>
+                                                    <span class="servico-badge">
+                                                        <i data-lucide="scissors"></i>
+                                                        <?php echo htmlspecialchars(trim($servico_nome)); ?>
+                                                    </span>
+                                                <?php endforeach; ?>
+                                            </div>
                                             <p class="agendamento-item__details">
                                                 <strong>Profissional:</strong> <?php echo htmlspecialchars($agendamento->profissional_nome ?? 'N/A'); ?><br>
                                                 <strong>Horário:</strong> <?php echo $data['hora']; ?> • <?php echo $data['data_completa']; ?>
@@ -355,8 +375,8 @@ $total_agendados = $dados['total_agendados'] ?? 0;
                             </div>
                         <?php endforeach; ?>
                         <?php if (count($agendamentos) > 5): ?>
-                            <div style="text-align: center; margin-top: 1rem;">
-                                <a href="Index.php?acao=agendamento_criar" class="btn-header btn-header--primary" style="display: inline-flex;">
+                            <div class="text-center mt-1">
+                                <a href="Index.php?acao=agendamento_criar" class="btn-header btn-header--primary display-inline-flex">
                                     Ver Todos os Agendamentos
                                 </a>
                             </div>

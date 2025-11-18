@@ -78,6 +78,18 @@ $total_agendamentos = $dados['total_agendamentos'] ?? 0;
                         <i data-lucide="users"></i>
                         <span>Clientes</span>
                     </a>
+                    <a href="Index.php?acao=relatorio_financeiro_mostrar" class="burger-menu__item">
+                        <i data-lucide="dollar-sign"></i>
+                        <span>Relatório Financeiro</span>
+                    </a>
+                    <a href="Index.php?acao=relatorio_clientes_mostrar" class="burger-menu__item">
+                        <i data-lucide="bar-chart"></i>
+                        <span>Relatório de Clientes</span>
+                    </a>
+                    <a href="Index.php?acao=despesa_listar" class="burger-menu__item">
+                        <i data-lucide="trending-down"></i>
+                        <span>Gerenciar Despesas</span>
+                    </a>
                     <div class="burger-menu__divider"></div>
                     <a href="Index.php?acao=logout" class="burger-menu__item">
                         <i data-lucide="log-out"></i>
@@ -164,6 +176,24 @@ $total_agendamentos = $dados['total_agendamentos'] ?? 0;
                 <div class="admin-card__icon"><i data-lucide="users"></i></div>
                 <h3 class="admin-card__title">Gerenciar Clientes</h3>
                 <p class="admin-card__description">Visualize e gerencie o cadastro de clientes</p>
+            </a>
+            
+            <a href="Index.php?acao=relatorio_financeiro_mostrar" class="admin-card">
+                <div class="admin-card__icon"><i data-lucide="dollar-sign"></i></div>
+                <h3 class="admin-card__title">Relatório Financeiro</h3>
+                <p class="admin-card__description">Visualize receitas de agendamentos concluídos</p>
+            </a>
+            
+            <a href="Index.php?acao=relatorio_clientes_mostrar" class="admin-card">
+                <div class="admin-card__icon"><i data-lucide="bar-chart"></i></div>
+                <h3 class="admin-card__title">Relatório de Clientes</h3>
+                <p class="admin-card__description">Estatísticas e análises de clientes</p>
+            </a>
+            
+            <a href="Index.php?acao=despesa_listar" class="admin-card">
+                <div class="admin-card__icon"><i data-lucide="trending-down"></i></div>
+                <h3 class="admin-card__title">Gerenciar Despesas</h3>
+                <p class="admin-card__description">Registre e acompanhe as despesas do salão</p>
             </a>
         </div>
     </div>

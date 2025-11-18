@@ -264,6 +264,10 @@ $usuario_nome = $_SESSION['usuario_nome'] ?? 'Cliente';
                         <i data-lucide="clipboard-list"></i>
                         <span>Gerenciar Agendamentos</span>
                     </a>
+                    <a href="Index.php?acao=cliente_historico_mostrar" class="burger-menu__item">
+                        <i data-lucide="history"></i>
+                        <span>Meu Histórico</span>
+                    </a>
                     <a href="Index.php?acao=perfil_mostrar" class="burger-menu__item">
                         <i data-lucide="user"></i>
                         <span>Meu Perfil</span>
@@ -302,6 +306,10 @@ $usuario_nome = $_SESSION['usuario_nome'] ?? 'Cliente';
                         <a href="Index.php?acao=gerenciar_agendamento_mostrar" class="navbar-user__dropdown-item">
                             <i data-lucide="clipboard-list"></i>
                             <span>Gerenciar Agendamentos</span>
+                        </a>
+                        <a href="Index.php?acao=cliente_historico_mostrar" class="navbar-user__dropdown-item">
+                            <i data-lucide="history"></i>
+                            <span>Meu Histórico</span>
                         </a>
                         <div class="navbar-user__dropdown-divider"></div>
                         <a href="Index.php?acao=logout" class="navbar-user__dropdown-item">
@@ -365,8 +373,7 @@ $usuario_nome = $_SESSION['usuario_nome'] ?? 'Cliente';
                 endif;
                 ?>
 
-                <form action="Index.php" method="POST">
-                    <input type="hidden" name="acao" value="agendamento_salvar">
+                <form action="Index.php?acao=agendamento_salvar" method="POST">
 
                     <div class="form-group">
                         <label for="profissional_id">
@@ -448,32 +455,32 @@ $usuario_nome = $_SESSION['usuario_nome'] ?? 'Cliente';
                     ?>
                         <div class="agendamento-item">
                             <div class="agendamento-item__header">
-                                <div class="agendamento-item__content">
-                                    <h3 class="agendamento-item__title">
-                                        <i data-lucide="scissors"></i>
-                                        <?php echo htmlspecialchars($a->servicos ?? 'Serviço'); ?>
-                                    </h3>
-                                    <p class="agendamento-item__details">
-                                        <strong>
-                                            <i data-lucide="user"></i>
-                                            Profissional:
-                                        </strong> <?php echo htmlspecialchars($a->profissional_nome ?? 'N/A'); ?><br>
-                                        <strong>
-                                            <i data-lucide="calendar"></i>
-                                            Data:
-                                        </strong> <?php echo $data['data_completa']; ?> às <?php echo $data['hora']; ?>
-                                    </p>
+                                <div class="agendamento-item__date">
+                                    <div class="date-badge">
+                                        <div class="date-badge__day"><?php echo $data['dia']; ?></div>
+                                        <div class="date-badge__month"><?php echo $data['mes']; ?></div>
+                                    </div>
+                                    <div class="agendamento-item__info">
+                                        <h3 class="agendamento-item__title">Agendamento #<?php echo htmlspecialchars($a->id); ?></h3>
+                                        <div class="agendamento-servicos">
+                                            <?php 
+                                            // Divide os serviços e cria badges individuais
+                                            $servicos_array = explode(', ', $a->servicos ?? 'Serviço');
+                                            foreach($servicos_array as $servico_nome): 
+                                            ?>
+                                                <span class="servico-badge">
+                                                    <i data-lucide="scissors"></i>
+                                                    <?php echo htmlspecialchars(trim($servico_nome)); ?>
+                                                </span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <p class="agendamento-item__details">
+                                            <strong>Profissional:</strong> <?php echo htmlspecialchars($a->profissional_nome ?? 'N/A'); ?><br>
+                                            <strong>Horário:</strong> <?php echo $data['hora']; ?> • <?php echo $data['data_completa']; ?>
+                                        </p>
+                                    </div>
                                 </div>
                                 <span class="status-badge <?php echo $status['class']; ?>">
-                                    <?php
-                                    $iconMap = [
-                                        'AGENDADO' => 'clock',
-                                        'CONCLUIDO' => 'check-circle',
-                                        'CANCELADO' => 'x-circle'
-                                    ];
-                                    $iconName = $iconMap[$a->status] ?? 'circle';
-                                    ?>
-                                    <i data-lucide="<?php echo $iconName; ?>"></i>
                                     <?php echo $status['texto']; ?>
                                 </span>
                             </div>
