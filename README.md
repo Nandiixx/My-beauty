@@ -424,8 +424,8 @@ Para usuários do **USBWebServer** (Windows):
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/Nandiixx/Eu-e-o-Shadow.git
-cd Eu-e-o-Shadow
+git clone https://github.com/Nandiixx/My-beauty.git
+cd My-beauty
 
 # 2. Inicie o servidor (duplo clique)
 iniciar_servidor.bat
@@ -469,8 +469,8 @@ http://localhost:8000/Index.php
 #### 1️⃣ Clone o Repositório
 
 ```bash
-git clone https://github.com/Nandiixx/Eu-e-o-Shadow.git
-cd Eu-e-o-Shadow
+git clone https://github.com/Nandiixx/My-beauty.git
+cd My-beauty
 ```
 
 #### 2️⃣ Configure o Banco de Dados
@@ -1446,7 +1446,7 @@ Contribuições são sempre bem-vindas! Veja como você pode ajudar:
 
 ```bash
 # 1. Fork o repositório
-git clone https://github.com/seu-usuario/Eu-e-o-Shadow.git
+git clone https://github.com/seu-usuario/My-beauty.git
 
 # 2. Crie uma branch para sua feature
 git checkout -b feature/minha-nova-feature
@@ -1533,8 +1533,8 @@ chore: atualiza dependências do composer
 **🐛 Bugs e Problemas Técnicos**
 
 Encontrou um bug?
-1. Verifique as [Issues abertas](https://github.com/Nandiixx/Eu-e-o-Shadow/issues)
-2. Se não existir, [abra uma nova issue](https://github.com/Nandiixx/Eu-e-o-Shadow/issues/new)
+1. Verifique as [Issues abertas](https://github.com/Nandiixx/My-beauty/issues)
+2. Se não existir, [abra uma nova issue](https://github.com/Nandiixx/My-beauty/issues/new)
 3. Descreva: o que esperava, o que aconteceu, steps to reproduce
 
 </td>
@@ -1544,8 +1544,8 @@ Encontrou um bug?
 
 Tem dúvidas sobre como usar?
 1. Consulte a [Documentação](#-documentação)
-2. Verifique as [Issues fechadas](https://github.com/Nandiixx/Eu-e-o-Shadow/issues?q=is%3Aissue+is%3Aclosed)
-3. Abra uma [Discussion](https://github.com/Nandiixx/Eu-e-o-Shadow/discussions)
+2. Verifique as [Issues fechadas](https://github.com/Nandiixx/My-beauty/issues?q=is%3Aissue+is%3Aclosed)
+3. Abra uma [Discussion](https://github.com/Nandiixx/My-beauty/discussions)
 
 </td>
 </tr>
