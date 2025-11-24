@@ -1050,56 +1050,13 @@ O projeto conta com documentação completa e bem organizada:
 <a href="README.md"><b>README.md</b></a>
 <br><sub>⏱️ 15 min</sub>
 </td>
-<td>
-Documentação principal do projeto (este arquivo)
-<br>
-<sub>Visão geral, instalação, uso e arquitetura</sub>
-</td>
-<td>
-<b>Todos</b>
-</td>
-</tr>
 
-<tr>
-<td>
-<a href="QUICK_START.md"><b>QUICK_START.md</b></a>
-<br><sub>⏱️ 5 min</sub>
-</td>
-<td>
-Resumo visual das mudanças na refatoração MVC
-<br>
-<sub>Comparação antes/depois, troubleshooting rápido</sub>
-</td>
-<td>
-<b>Devs</b>
-</td>
-</tr>
-
-<tr>
-<td>
-<a href="INDEX_DOCUMENTACAO.md"><b>INDEX_DOCUMENTACAO.md</b></a>
-<br><sub>⏱️ 3 min</sub>
-</td>
-<td>
-Índice central de toda documentação
-<br>
 <sub>Guia de navegação e fluxos de leitura recomendados</sub>
 </td>
 <td>
 <b>Todos</b>
 </td>
-</tr>
 
-<tr>
-<td>
-<a href="GUIA_DE_TESTES.md"><b>GUIA_DE_TESTES.md</b></a>
-<br><sub>⏱️ 20 min + testes</sub>
-</td>
-<td>
-Checklist completo de testes manuais
-<br>
-<sub>Testes de autenticação, assets, funcionalidades e segurança</sub>
-</td>
 <td>
 <b>QA/Devs</b>
 </td>
