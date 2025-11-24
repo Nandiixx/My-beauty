@@ -1467,13 +1467,13 @@ chore: atualiza dependências do composer
 
 ### 🎓 Sobre o Projeto Acadêmico
 
-**Instituição**: [Nome da Instituição]
+**Instituição**: Etec Martin Luther King
 <br>
 **Curso**: Técnico/Tecnólogo em Desenvolvimento de Sistemas
 <br>
 **Ano**: 2024/2025
 <br>
-**Orientador**: [Nome do Professor]
+**Orientador**: Tatiana Carla De Mattos Valerio Monteiro
 
 </div>
 
@@ -1510,8 +1510,8 @@ Tem dúvidas sobre como usar?
 
 ### 📧 Contato Direto
 
-- **Email**: seu-email@exemplo.com
-- **LinkedIn**: [Seu Perfil](https://linkedin.com/in/seu-perfil)
+- **Email**: nandiixx.official@gmail.com
+- **LinkedIn**: [Seu Perfil](https://linkedin.com/in/nandiixx)
 
 ---
 
