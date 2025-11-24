@@ -1457,7 +1457,7 @@ chore: atualiza dependências do composer
 ### 👤 **Hernandes (Nandiixx)**
 
 [![GitHub](https://img.shields.io/badge/GitHub-Nandiixx-181717?style=for-the-badge&logo=github)](https://github.com/Nandiixx)
-[![Email](https://img.shields.io/badge/Email-Contato-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:seu-email@exemplo.com)
+[![Email](https://img.shields.io/badge/Email-Contato-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:nandiixx.official@gmail.com)
 
 **Estudante de Desenvolvimento de Sistemas**
 <br>
@@ -1511,7 +1511,7 @@ Tem dúvidas sobre como usar?
 ### 📧 Contato Direto
 
 - **Email**: nandiixx.official@gmail.com
-- **LinkedIn**: [Seu Perfil](https://linkedin.com/in/nandiixx)
+- **LinkedIn**: [Nandiixx](https://linkedin.com/in/nandiixx)
 
 ---
 
